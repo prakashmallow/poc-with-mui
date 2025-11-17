@@ -67,9 +67,11 @@ const ThemeWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => 
               },
               containedPrimary: {
                 backgroundColor: secondaryColor || "#1e285f",
+                border: "1px solid transparent",
                 "&:hover": {
                   backgroundColor: secondaryLightColor || "#e6fafa",
                   color: secondaryColor || "#1e285f",
+                  border: `1px solid ${secondaryColor || "#1e285f"}`,
                 },
               },
               outlinedPrimary: {
@@ -79,13 +81,16 @@ const ThemeWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => 
                   backgroundColor: secondaryLightColor || "#e6fafa",
                   borderColor: secondaryColor || "#1e285f",
                   color: secondaryColor || "#1e285f",
+                  border: `1px solid ${secondaryColor || "#1e285f"}`,
                 },
               },
               textPrimary: {
                 color: secondaryColor || "#1e285f",
+                border: "1px solid transparent",
                 "&:hover": {
                   backgroundColor: secondaryLightColor || "#e6fafa",
                   color: secondaryColor || "#1e285f",
+                  border: `1px solid ${secondaryColor || "#1e285f"}`,
                 },
               },
             },
