@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "@/styles/rootVariables.css";
 import "./globals.css";
 import CustomLayout from "@/components/CustomLayout";
+import SiteHeader from "@/components/shared/Header/SiteHeader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +32,9 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <CustomLayout>
+          {/*<SiteHeader>*/}
           {children}
+          {/*</SiteHeader>*/}
         </CustomLayout>
       </body>
     </html>
