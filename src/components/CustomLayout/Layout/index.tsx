@@ -23,6 +23,29 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => {
         const root = document.documentElement;
+        
+        // Update favicon
+        if (projectDetails?.favicon_url) {
+          // Update or create favicon link
+          const faviconSelectors = ["link[rel='icon']", "link[rel='shortcut icon']"];
+          let faviconLink = null;
+          
+          for (const selector of faviconSelectors) {
+            const link = document.querySelector(selector) as HTMLLinkElement;
+            if (link) {
+              faviconLink = link;
+              break;
+            }
+          }
+          
+          if (!faviconLink) {
+            faviconLink = document.createElement('link');
+            faviconLink.rel = 'icon';
+            document.head.appendChild(faviconLink);
+          }
+          faviconLink.href = projectDetails.favicon_url;
+        }
+        
         if (projectDetails?.font_details) {
           const primaryFontLink = document.createElement('link');
           const headerFontLink = document.createElement('link');
@@ -104,7 +127,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         }
       }, [
         projectDetails?.theme?.custom_css_variables,
-        projectDetails?.font_details
+        projectDetails?.font_details,
+        projectDetails?.favicon_url
       ]);
 
     // Prevent hydration mismatch by only showing loading state after mount
