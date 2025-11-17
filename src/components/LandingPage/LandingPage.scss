@@ -1,0 +1,7 @@
+
+.landing-page {
+    @apply h-screen w-full bg-cover bg-center bg-no-repeat flex items-center justify-center flex-col;
+    .logo {
+        @apply w-auto max-w-[300px] mb-[10px] p-[8px];
+    }
+}

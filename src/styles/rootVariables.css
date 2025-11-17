@@ -1,0 +1,21 @@
+:root{
+    --primary-color: #14A073;
+    --primary-light-color: #e6ffeb;
+    --secondary-color: #1e285f;
+    --secondary-light-color: #e6fafa;
+    --neutral-dark-color: #656961;
+    --neutral-medium-color: #bec2b9;
+    --neutral-light-color: #f0efeb;
+    --background-color: #ffffff;
+    --info-color: #1e285f;
+    --info-light-color: #e6fafa;
+    --success-color: #14A073;
+    --success-light-color: #E6FFEB;
+    --warning-color: #DE881F;
+    --warning-light-color: #FFEFDB;
+    --danger-color: #D63D2F;
+    --danger-light-color: #FFEAE8;
+    --white-color: #ffffff;
+    --primary-font-family: -apple-system, sans-serif;
+    --header-font-family: -apple-system, sans-serif;
+}
