@@ -4,6 +4,7 @@ import {
 } from '@/utils/constants';
 import { useDispatch } from 'react-redux';
 import LinguistsListActions from '@/app/staff/linguists/LinguistListAction';
+import ClientListActions from "@/app/staff/clients/ClientListActions";
 type Dispatch = ReturnType<typeof useDispatch>;
 export const getSiteHeaderDetails = (
     pathName: string,
@@ -21,5 +22,12 @@ export const getSiteHeaderDetails = (
             children: <LinguistsListActions />
         };
     }
+   else if(pathName === '/staff/clients'){
+       return {
+              title: 'Clients',
+              children: <ClientListActions />
+       }
+   }
+
     return {};
 };

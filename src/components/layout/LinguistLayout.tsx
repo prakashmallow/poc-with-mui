@@ -1,7 +1,7 @@
 'use client';
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
-
+import "./LinguistLayout.scss";
 type HeaderDetails = {
     title?: string | React.ReactNode;
     children?: React.ReactNode;
@@ -38,7 +38,7 @@ const LinguistLayout: React.FC<LinguistLayoutProps> = ({
             >
                 <div className="flex justify-between items-center px-4 h-full">
                     <div className="flex flex-col">
-                        <h2 className="py-1 text-white text-[32px]">{title}</h2>
+                        <h2 className="py-1 text-white text-[32px] bressay-font">{title}</h2>
                     </div>
                     <div className="flex gap-2">{siteHeaderChildren}</div>
                 </div>

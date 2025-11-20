@@ -6,20 +6,24 @@ import Button from '@mui/material/Button';
 import Popover from '@mui/material/Popover';
 
 interface FilterComponentProps {
-    popOverComponent: any;
-    updatePopOverVisibility: any;
+    popOverComponent: React.ReactNode;
+    updatePopOverVisibility: (visible?: boolean) => void;
     filtersData?: Record<string, unknown>;
     isFiltersOpen: boolean;
     stylesClassName?: string;
+    onResetFilters?: () => void;
+    onApplyFilters?: () => void;
 }
 
 const FilterComponent: React.FC<FilterComponentProps> = ({
-                                                             popOverComponent,
-                                                             updatePopOverVisibility,
-                                                             filtersData = {},
-                                                             isFiltersOpen,
-                                                             stylesClassName
-                                                         }) => {
+    popOverComponent,
+    updatePopOverVisibility,
+    filtersData = {},
+    isFiltersOpen,
+    stylesClassName,
+    onResetFilters,
+    onApplyFilters
+}) => {
     const buttonRef = useRef<HTMLButtonElement | null>(null);
     const appliedFiltersCount = Object.keys(filtersData).length;
 
@@ -61,8 +65,43 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
                     horizontal: 'left',
                 }}
                 transitionDuration={200}
+                PaperProps={{
+                    sx: {
+                        p: 0,
+                        maxWidth: 720
+                    }
+                }}
             >
-                {popOverComponent}
+                <div className={`flex flex-col ${stylesClassName ?? ''}`}>
+                    <div className="p-6 overflow-auto max-h-[70vh]">
+                        {popOverComponent}
+                    </div>
+                    <div className="flex items-center justify-between border-t border-neutral-200 bg-neutral-50 px-4 py-3 gap-3">
+                        <Button
+                            variant="outlined"
+                            onClick={() => onResetFilters?.()}
+                        >
+                            Reset
+                        </Button>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="outlined"
+                                onClick={() => updatePopOverVisibility(false)}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="contained"
+                                onClick={() => {
+                                    onApplyFilters?.();
+                                    updatePopOverVisibility(false);
+                                }}
+                            >
+                                Apply
+                            </Button>
+                        </div>
+                    </div>
+                </div>
             </Popover>
 
         </>
