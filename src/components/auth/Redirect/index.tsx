@@ -8,8 +8,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { authActions } from '@/redux/Auth/AuthState';
 import { getCookie } from '@/utils';
 
-import { RootState } from '@/redux/store';
 import Loading from '@/components/Loading';
+import { RootState } from '@/redux/store';
 
 const Redirect: React.FC<any> = () => {
   const router = useRouter();
