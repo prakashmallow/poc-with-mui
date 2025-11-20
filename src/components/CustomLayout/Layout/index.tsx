@@ -5,12 +5,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { tenantActions } from "@/redux/Tenant/TenantState";
 // import { authActions } from "@/redux/Auth/AuthState";
 import { useEffect, useState } from "react";
+import HeaderNavBar from "@/components/Header/HeaderNavBar";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
     const dispatch = useDispatch();
     const loading = useSelector((state: RootState) => state.auth.loading);
     const projectDetailsLoader = useSelector((state: RootState) => state.tenant.projectDetailsLoader);
     const projectDetails = useSelector((state: RootState) => state.tenant.projectDetails);
+    const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -132,15 +134,20 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       ]);
 
     // Prevent hydration mismatch by only showing loading state after mount
-    if (!mounted) {
+    if (!mounted || loading || projectDetailsLoader) {
         return <Loading />;
     }
 
-    return (
-        <>
-            {loading || projectDetailsLoader ? <Loading /> : children}
-        </>
-    );
+    if (isAuthenticated) {
+        return (
+            <>
+                <HeaderNavBar />
+                {children}
+            </>
+        )
+    }
+    
+    return children;
 };
 
 export default Layout;

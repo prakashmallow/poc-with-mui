@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import Image from "next/image";
 import "./LandingPage.scss";
 import { Button, Card, CardContent, Typography } from "@mui/material";
+import { handleLogin } from "@/utils";
 
 const LandingPage = () => {
   const projectDetails = useSelector((state: RootState) => state.tenant.projectDetails);
@@ -30,7 +31,7 @@ const LandingPage = () => {
                     </Typography>
                     <div className="flex gap-2">
                         <Button variant="outlined" size="large">Sign UP</Button>
-                        <Button variant="contained" color="primary" size="large">Sign IN</Button>
+                        <Button variant="contained" color="primary" size="large" onClick={() => handleLogin('linguist')}>Sign IN</Button>
                     </div>
                 </CardContent>
             </Card>
@@ -43,7 +44,7 @@ const LandingPage = () => {
                         Sign in here if you work directly for Dals
                     </Typography>
                     <div className="flex gap-2">
-                        <Button variant="contained" color="primary" size="large">Single Sign On</Button>
+                        <Button variant="contained" color="primary" size="large" onClick={() => handleLogin('staff')}>Single Sign On</Button>
                     </div>
                 </CardContent>
             </Card>

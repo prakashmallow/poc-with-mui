@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { call, put, takeLatest } from 'redux-saga/effects';
 import { omit } from 'lodash';
 
@@ -66,6 +68,7 @@ function* onGetAuthorize(params: any): Generator<any, void, unknown> {
         localStorage.setItem('callback_route_path', window.location.href);
       }
     }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     handleErrorResponse(error, {
       action: actions.getAutherize,
@@ -87,14 +90,18 @@ function* onGetTokens(params: any): Generator<any> {
     );
     yield put(actions.getAutherize({ ...rest }));
   } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     yield put(actions.getTokensFailure(error));
+    window.location.href = '/';
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function* onGetRefreshToken(params: any): Generator<any, void, unknown> {
   try {
     const { callbackActionDetails } = params.payload;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const response: any = yield call(() =>
       postPromise(
         'v1/refresh_access_token',
@@ -148,7 +155,7 @@ function* onGetLinguistInitDetails(params: any): Generator<any, void, unknown> {
   try {
     const { isFromTokens, router, searchParamsObject } = params.payload;
     const response: any = yield call(() => getPromise('v1/linguists/user_identity', { isLinguist: true }));
-    let responseData = omit(
+    const responseData = omit(
       {
         ...response.data,
         ...response.data.attributes,
@@ -268,6 +275,7 @@ export function* onGetVRIUserMe(
     }
   } catch (error) {
     yield put(actions.getVRIUserMeFailure());
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     handleErrorResponse(error, params);
   }
