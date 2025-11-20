@@ -1,8 +1,10 @@
-import type { Metadata } from "next";
-// import { Geist, Geist_Mono } from "next/font/google";
-import "@/styles/rootVariables.css";
-import "./globals.css";
 import CustomLayout from "@/components/CustomLayout";
+import RootLayoutClient from "@/components/layout/RootLayoutClient";
+import "@/styles/rootVariables.css";
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+// import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -32,7 +34,9 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <CustomLayout>
-          {children}
+          <RootLayoutClient>
+            {children}
+          </RootLayoutClient>
         </CustomLayout>
       </body>
     </html>

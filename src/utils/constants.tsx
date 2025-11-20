@@ -15,7 +15,8 @@ export const publicRoutes: string[] = [
   '/auth_login_callback',
   '/auth/redirect',
   '/login',
-  '/'
+  '/',
+  '/staff/linguists'
 ];
 
 export const unauthorizedRoutes: string[] = [
@@ -24,7 +25,8 @@ export const unauthorizedRoutes: string[] = [
   '/linguist/giving-reference',
   '/email-confirmation',
   '/invite/set-password',
-  '/'
+  '/',
+  '/staff/linguists'
 ];
 
 export const basePathNames = {
@@ -240,10 +242,10 @@ export const dropDownSearchPlaceHolder: string =
   'Enter more than 3 characters to search';
 
 export const alphanumericCharactersRule: { pattern: RegExp; message: string } =
-  {
-    pattern: /^[A-Za-z0-9]+$/,
-    message: 'Only alphanumeric characters are allowed'
-  };
+{
+  pattern: /^[A-Za-z0-9]+$/,
+  message: 'Only alphanumeric characters are allowed'
+};
 
 export const numbersNotAllowedRule: { pattern: RegExp; message: string } = {
   pattern: /^([^0-9]*)$/,
