@@ -178,6 +178,10 @@ const ClientListFilter = forwardRef<ClientListFilterHandle>((_, ref) => {
             placeholder: 'Select Country',
             select: true,
             options: selectOptions.country
+        },
+        {
+            label: 'Postcode',
+            field: 'postcode',
         }
     ]), []);
 
@@ -191,7 +195,7 @@ const ClientListFilter = forwardRef<ClientListFilterHandle>((_, ref) => {
             <Box
                 sx={{
                     display: 'grid',
-                    gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                    gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
                     gap: 2
                 }}
             >
@@ -214,9 +218,20 @@ const ClientListFilter = forwardRef<ClientListFilterHandle>((_, ref) => {
                             SelectProps={{
                                 multiple: input.multiple
                             }}
+                            sx={{
+                                '& .MuiInputBase-input': {
+                                    fontSize: '12px'
+                                },
+                                '& .MuiInputLabel-root': {
+                                    fontSize: '12px'
+                                },
+                                '& .MuiSelect-select': {
+                                    fontSize: '12px'
+                                }
+                            }}
                         >
                             {input.select && input.options?.map(option => (
-                                <MenuItem key={option.value} value={option.value}>
+                                <MenuItem key={option.value} value={option.value} sx={{ fontSize: '12px' }}>
                                     {option.label}
                                 </MenuItem>
                             ))}

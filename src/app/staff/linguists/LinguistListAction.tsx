@@ -1,10 +1,10 @@
 'use client';
-import React from 'react';
-import { Button, CardContent, Typography } from "@mui/material";
-import { useRouter } from 'next/navigation';
-import { useDispatch } from 'react-redux';
+import LinguistListFilter, { LinguistListFilterHandle } from '@/app/staff/linguists/LinguistListFilter';
 import FilterComponent from '@/components/shared/FilterComponent';
-import LinguistListFilter from '@/app/staff/linguists/LinguistListFilter';
+import { Button } from "@mui/material";
+import { useRouter } from 'next/navigation';
+import React from 'react';
+import { useDispatch } from 'react-redux';
 // import AssignToStaffForm from '@/components/linguistList/AssignToStaffForm';
 // import {
 //     copyContactRestrictionMessage,
@@ -17,7 +17,6 @@ import LinguistListFilter from '@/app/staff/linguists/LinguistListFilter';
 // import FilterComponent from '@/components/shared/Header/FilterComponent';
 // import { modalActions } from '@/components/shared/redux/Modals/ModalsState';
 // import { getSortingData } from '@/components/shared/utils';
-import {basePathNames} from '@/utils/constants';
 
 //
 // import { linguistAssignToStaffActions } from '@/redux/linguistAssignToStaff/LinguistAssignToStaffState';
@@ -30,6 +29,25 @@ const LinguistsListActions: React.FC<any> = () => {
     const router = useRouter();
     const dispatch = useDispatch();
     const [isFilterOpen, setIsFilterOpen] = React.useState(false);
+    const [appliedFilters, setAppliedFilters] = React.useState<Record<string, unknown>>({});
+    const filterRef = React.useRef<LinguistListFilterHandle>(null);
+
+    const updateFilterVisibility = (visible?: boolean) => {
+        setIsFilterOpen(prev => (typeof visible === 'boolean' ? visible : !prev));
+    };
+
+    const handleResetFilters = () => {
+        filterRef.current?.resetFilters();
+        setAppliedFilters({});
+    };
+
+    const handleApplyFilters = () => {
+        const values = filterRef.current?.getFilters();
+        if (values) {
+            setAppliedFilters(values);
+        }
+    };
+
     return (
         // <>
         //     {isAllLinguistSelected || selectedLinguists?.length ? (
@@ -53,34 +71,37 @@ const LinguistsListActions: React.FC<any> = () => {
         //             </Button>
         //         </>
         //     ) : (
-                <>
-                    <Button variant="outlined"
-                            color="primary"
-                            size="large"
-                            className="bg-white">
-                        Export
-                    </Button>
-                    <Button variant="outlined"
-                            color="primary"
-                            size="large"
-                            className="bg-white">
-                        Import
-                    </Button>
-                    <FilterComponent
-                        popOverComponent={<LinguistListFilter />}
-                        updatePopOverVisibility={()=>setIsFilterOpen(!isFilterOpen)}
-                        isFiltersOpen={isFilterOpen}
-                    />
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            size="large"
-                            startIcon={<i className="da da-plus" />}
-                        >
-                            New Linguist
-                        </Button>
-                    {/*)}*/}
-                </>
+        <>
+            <Button variant="outlined"
+                color="primary"
+                size="large"
+                className="bg-white">
+                Export
+            </Button>
+            <Button variant="outlined"
+                color="primary"
+                size="large"
+                className="bg-white">
+                Import
+            </Button>
+            <FilterComponent
+                popOverComponent={<LinguistListFilter ref={filterRef} />}
+                updatePopOverVisibility={updateFilterVisibility}
+                isFiltersOpen={isFilterOpen}
+                filtersData={appliedFilters}
+                onResetFilters={handleResetFilters}
+                onApplyFilters={handleApplyFilters}
+            />
+            <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                startIcon={<i className="da da-plus" />}
+            >
+                New Linguist
+            </Button>
+            {/*)}*/}
+        </>
         //     )}
         // </>
     );
