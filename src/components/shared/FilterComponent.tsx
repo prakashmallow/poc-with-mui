@@ -65,10 +65,12 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
                     horizontal: 'left',
                 }}
                 transitionDuration={200}
-                PaperProps={{
-                    sx: {
-                        p: 0,
-                        maxWidth: 720
+                slotProps={{
+                    paper: {
+                        sx: {
+                            p: 0,
+                            width: 735
+                        }
                     }
                 }}
             >
