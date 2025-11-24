@@ -1,10 +1,10 @@
+import LinguistsListActions from '@/app/staff/linguists/LinguistListAction';
+import ClientsListActions from '@/app/staff/clients/ClientListAction';
 import {
-    basePathNames,
-    linguistPermissionSlugs
+    basePathNames
 } from '@/utils/constants';
 import { useDispatch } from 'react-redux';
-import LinguistsListActions from '@/app/staff/linguists/LinguistListAction';
-import ClientListActions from "@/components/staff/clients/ClientListActions";
+// import ClientListActions from "@/components/staff/clients/ClientListActions";
 type Dispatch = ReturnType<typeof useDispatch>;
 export const getSiteHeaderDetails = (
     pathName: string,
@@ -16,18 +16,18 @@ export const getSiteHeaderDetails = (
         linguistHistory: { contentPaths }
     } = basePathNames;
     const paths: string[] = pathName?.split('/') || [];
-   if (pathName === '/staff/linguists') {
+    if (pathName === '/staff/linguists') {
         return {
             title: 'Linguists',
             children: <LinguistsListActions />
         };
     }
-   else if(pathName === '/staff/clients'){
-       return {
-              title: 'Clients',
-              children: <ClientListActions />
-       }
-   }
+    else if (pathName === '/staff/clients') {
+        return {
+            title: 'Clients',
+            children: <ClientsListActions />
+        }
+    }
 
     return {};
 };
