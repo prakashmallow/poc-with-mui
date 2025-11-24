@@ -135,19 +135,19 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
     // Prevent hydration mismatch by only showing loading state after mount
     if (!mounted || loading || projectDetailsLoader) {
-        return <Loading />;
+        return <main><Loading /></main>;
     }
 
     if (isAuthenticated) {
         return (
-            <>
+            <main>
                 <HeaderNavBar />
                 {children}
-            </>
+            </main>
         )
     }
     
-    return children;
+    return <main>{children}</main>;
 };
 
 export default Layout;

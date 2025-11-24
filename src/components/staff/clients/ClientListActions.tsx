@@ -1,5 +1,5 @@
 'use client';
-import ClientListFilter, { ClientListFilterHandle } from '@/app/staff/clients/ClientListFilter';
+import ClientListFilter, { ClientListFilterHandle } from '@/components/staff/clients/ClientListFilter';
 import FilterComponent from '@/components/shared/FilterComponent';
 import { Button } from "@mui/material";
 import React from 'react';
@@ -92,7 +92,7 @@ const ClientListActions: React.FC<any> = () => {
                 size="large"
                 startIcon={<i className="da da-plus" />}
             >
-                New Linguist
+                New Client
             </Button>
             {/*)}*/}
         </>

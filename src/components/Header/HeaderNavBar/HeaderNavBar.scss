@@ -1,2 +1,8 @@
 // Minimal SCSS - colors are handled by MUI theme configuration
 // Only keeping this file for any layout-specific styles that can't be handled by MUI sx prop
+
+.header-navbar-menu-link {
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+}

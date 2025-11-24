@@ -4,7 +4,7 @@ import {
 } from '@/utils/constants';
 import { useDispatch } from 'react-redux';
 import LinguistsListActions from '@/app/staff/linguists/LinguistListAction';
-import ClientListActions from "@/app/staff/clients/ClientListActions";
+import ClientListActions from "@/components/staff/clients/ClientListActions";
 type Dispatch = ReturnType<typeof useDispatch>;
 export const getSiteHeaderDetails = (
     pathName: string,

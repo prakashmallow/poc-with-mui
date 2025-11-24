@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { RootState } from "@/redux/store";
 import Image from "next/image";
@@ -15,12 +15,13 @@ import {
   Box,
   Button,
   Typography,
-  Divider,
+  // Divider,
   ListSubheader,
 } from "@mui/material";
 import {
   KeyboardArrowDown,
 } from "@mui/icons-material";
+import "./HeaderNavBar.scss";
 
 interface MenuItemType {
     key: string;
@@ -35,6 +36,7 @@ const HeaderNavBar = () => {
   const projectDetails = useSelector((state: RootState) => state.tenant.projectDetails);
   const userDetails = useSelector((state: RootState) => state.auth.userDetails);
   const pathname = usePathname();
+  const router = useRouter();
   
   const [anchorEls, setAnchorEls] = useState<Record<string, HTMLElement | null>>({});
   const [avatarAnchorEl, setAvatarAnchorEl] = useState<HTMLElement | null>(null);
@@ -151,7 +153,7 @@ const HeaderNavBar = () => {
   const handleWebLinkNavigation = (webLinkUrl: string) => {
     const webAppUrl = getBaseUrl({ isWebApp: true });
     const fullUrl = `${webAppUrl}/${webLinkUrl}`;
-    window.location.href = fullUrl;
+    window.open(fullUrl, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -263,6 +265,7 @@ const HeaderNavBar = () => {
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl)}
                     onClose={() => handleMenuClose(menuKey)}
+                    // slotProps={{ list: { role: 'list' } }}
                   >
                     {(() => {
                       // Group submenu items by group property
@@ -286,11 +289,11 @@ const HeaderNavBar = () => {
                       // Render grouped items
                       Object.entries(groupedItems).forEach(([groupName, groupItems], groupIndex) => {
                         // Add divider before group (except for the very first group)
-                        if (groupIndex > 0) {
-                          menuElements.push(
-                            <Divider key={`${menuKey}-divider-${groupIndex}`} />
-                          );
-                        }
+                        // if (groupIndex > 0) {
+                        //   menuElements.push(
+                        //     <Divider key={`${menuKey}-divider-${groupIndex}`} />
+                        //   );
+                        // }
 
                         // Add group header at the top of the group
                         menuElements.push(
@@ -312,9 +315,10 @@ const HeaderNavBar = () => {
                             menuElements.push(
                               <MenuItem
                                 key={`${menuKey}-sub-${itemIndex}`}
-                                component={Link}
-                                href={subItem.path}
-                                onClick={() => handleMenuClose(menuKey)}
+                                onClick={() => {
+                                  handleMenuClose(menuKey);
+                                  router.push(subItem.path!);
+                                }}
                                 className={`header-navbar-submenu-item ${isSubItemSelected ? "header-navbar-submenu-item-selected" : ""}`}
                               >
                                 {subItem.label}
@@ -349,11 +353,11 @@ const HeaderNavBar = () => {
                       });
 
                       // Add divider before ungrouped items if there are groups
-                      if (Object.keys(groupedItems).length > 0 && ungroupedItems.length > 0) {
-                        menuElements.push(
-                          <Divider key={`${menuKey}-divider-ungrouped`} />
-                        );
-                      }
+                      // if (Object.keys(groupedItems).length > 0 && ungroupedItems.length > 0) {
+                      //   menuElements.push(
+                      //     <Divider key={`${menuKey}-divider-ungrouped`} />
+                      //   );
+                      // }
 
                       // Render ungrouped items
                       ungroupedItems.forEach((subItem) => {
@@ -362,9 +366,10 @@ const HeaderNavBar = () => {
                           menuElements.push(
                             <MenuItem
                               key={`${menuKey}-sub-${itemIndex}`}
-                              component={Link}
-                              href={subItem.path}
-                              onClick={() => handleMenuClose(menuKey)}
+                              onClick={() => {
+                                handleMenuClose(menuKey);
+                                router.push(subItem.path!);
+                              }}
                               className={`header-navbar-submenu-item ${isSubItemSelected ? "header-navbar-submenu-item-selected" : ""}`}
                             >
                               {subItem.label}
@@ -425,6 +430,7 @@ const HeaderNavBar = () => {
             open={Boolean(avatarAnchorEl)}
             onClose={handleAvatarClose}
             slotProps={{
+              list: { role: 'list' },
               paper: {
                 sx: {
                   minWidth: 200,
@@ -435,8 +441,7 @@ const HeaderNavBar = () => {
               },
             }}
           >
-            <MenuItem
-              onClick={handleAvatarClose}
+            <Box
               sx={{
                 borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
                 padding: "12px 16px",
@@ -482,7 +487,7 @@ const HeaderNavBar = () => {
                   )}
                 </Box>
               </Box>
-            </MenuItem>
+            </Box>
             <MenuItem onClick={handleAvatarClose} className="header-navbar-avatar-menu-item">Profile</MenuItem>
             <MenuItem onClick={handleAvatarClose} className="header-navbar-avatar-menu-item">Settings</MenuItem>
             <MenuItem onClick={handleAvatarClose} className="header-navbar-avatar-menu-item">Logout</MenuItem>

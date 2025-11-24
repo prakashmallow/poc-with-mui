@@ -265,6 +265,7 @@ const ThemeWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => 
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
         }}
+        tabIndex={-1}
       >
         {children}
       </div>

@@ -38,7 +38,7 @@ const LinguistLayout: React.FC<LinguistLayoutProps> = ({
             >
                 <div className="flex justify-between items-center px-4 h-full">
                     <div className="flex flex-col">
-                        <h2 className="py-1 text-white text-[32px] bressay-font">{title}</h2>
+                        <h1 className="py-1 text-white text-[32px] bressay-font">{title}</h1>
                     </div>
                     <div className="flex gap-2">{siteHeaderChildren}</div>
                 </div>
