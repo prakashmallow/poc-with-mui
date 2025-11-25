@@ -6,20 +6,25 @@ import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 
 const getDefaultFormValues = () => ({
-    clientName: '',
-    accountReference: '',
-    activeStatus: '',
-    type: 'prospect',
-    services: [] as string[],
+    // Row 1
+    searchWithName: '',
+    searchWithPrefixAccountRef: '',
+    active: '',
+    // Row 2
+    type: '',
+    services: '',
     sector: '',
+    // Row 3
     consortium: '',
     industry: '',
-    contractNumber: '',
+    contractPurchaseOrderNumber: '',
+    // Row 4
     providerSalesManager: '',
     providerAccountManager: '',
-    telephoneProcess: '',
+    telephoneInterpretingProcess: '',
+    // Row 5
     tiAccessNumber: '',
-    onDemandTi: '',
+    onDemandTI: '',
     country: ''
 });
 
@@ -31,13 +36,14 @@ export interface ClientListFilterHandle {
 }
 
 const selectOptions = {
-    activeStatus: [
+    active: [
         { label: 'Active', value: 'active' },
         { label: 'Inactive', value: 'inactive' }
     ],
     type: [
-        { label: 'Prospect', value: 'prospect' },
-        { label: 'Client', value: 'client' }
+        { label: 'Type 1', value: 'type1' },
+        { label: 'Type 2', value: 'type2' },
+        { label: 'Type 3', value: 'type3' }
     ],
     services: [
         { label: 'Translation', value: 'translation' },
@@ -46,26 +52,29 @@ const selectOptions = {
     ],
     sector: [
         { label: 'Healthcare', value: 'healthcare' },
-        { label: 'Government', value: 'government' },
-        { label: 'Education', value: 'education' }
+        { label: 'Legal', value: 'legal' },
+        { label: 'Business', value: 'business' },
+        { label: 'Government', value: 'government' }
     ],
     consortium: [
-        { label: 'Consortium A', value: 'consortium-a' },
-        { label: 'Consortium B', value: 'consortium-b' }
+        { label: 'Consortium 1', value: 'consortium1' },
+        { label: 'Consortium 2', value: 'consortium2' },
+        { label: 'Consortium 3', value: 'consortium3' }
     ],
     industry: [
+        { label: 'Healthcare', value: 'healthcare' },
         { label: 'Legal', value: 'legal' },
-        { label: 'Technology', value: 'technology' },
-        { label: 'Finance', value: 'finance' }
+        { label: 'Finance', value: 'finance' },
+        { label: 'Technology', value: 'technology' }
     ],
-    telephoneProcess: [
-        { label: 'Standard', value: 'standard' },
-        { label: 'Priority', value: 'priority' }
+    telephoneInterpretingProcess: [
+        { label: 'Process 1', value: 'process1' },
+        { label: 'Process 2', value: 'process2' },
+        { label: 'Process 3', value: 'process3' }
     ],
-    country: [
-        { label: 'United States', value: 'usa' },
-        { label: 'United Kingdom', value: 'uk' },
-        { label: 'Canada', value: 'canada' }
+    onDemandTI: [
+        { label: 'Yes', value: 'yes' },
+        { label: 'No', value: 'no' }
     ]
 };
 
@@ -88,35 +97,47 @@ const ClientListFilter = forwardRef<ClientListFilterHandle>((_, ref) => {
         getFilters
     }), [formValues]);
 
-    const formFields = useMemo(() => ([
+    type FieldInput = {
+        label: string;
+        field: keyof ClientListFilterValues;
+        placeholder?: string;
+        select?: boolean;
+        options?: Array<{ label: string; value: string }>;
+        autocomplete?: boolean;
+    };
+
+    const filterFields = useMemo<FieldInput[]>(() => ([
+        // Row 1
         {
             label: 'Search with Name',
-            field: 'clientName',
+            field: 'searchWithName',
             placeholder: 'Enter Client Name to filter'
         },
         {
             label: 'Search with Prefix / Account Ref',
-            field: 'accountReference',
-            placeholder: 'Enter Prefix / Account Ref'
+            field: 'searchWithPrefixAccountRef',
+            placeholder: 'Enter Prefix / Account Ref...'
         },
         {
             label: 'Active',
-            field: 'activeStatus',
-            placeholder: 'Select Active status to filter',
+            field: 'active',
+            placeholder: 'Select Active status to filt...',
             select: true,
-            options: selectOptions.activeStatus
+            options: selectOptions.active
         },
+        // Row 2
         {
             label: 'Type',
             field: 'type',
+            placeholder: 'Select type to filter',
             select: true,
             options: selectOptions.type
         },
         {
             label: 'Services',
             field: 'services',
+            placeholder: 'Select services to filter',
             select: true,
-            multiple: true,
             options: selectOptions.services
         },
         {
@@ -126,6 +147,7 @@ const ClientListFilter = forwardRef<ClientListFilterHandle>((_, ref) => {
             select: true,
             options: selectOptions.sector
         },
+        // Row 3
         {
             label: 'Consortium',
             field: 'consortium',
@@ -142,48 +164,82 @@ const ClientListFilter = forwardRef<ClientListFilterHandle>((_, ref) => {
         },
         {
             label: 'Contract / Purchase Order Number',
-            field: 'contractNumber',
-            placeholder: 'Select Contract / Purchase Order Number'
+            field: 'contractPurchaseOrderNumber',
+            placeholder: 'Select Contract / Purchase ...'
         },
+        // Row 4
         {
             label: 'Provider Sales Manager',
             field: 'providerSalesManager',
-            placeholder: 'Enter more than 3 characters'
+            placeholder: 'Enter more than 3 charac...',
+            autocomplete: true
         },
         {
             label: 'Provider Account Manager',
             field: 'providerAccountManager',
-            placeholder: 'Enter more than 3 characters'
+            placeholder: 'Enter more than 3 charac...',
+            autocomplete: true
         },
         {
             label: 'Telephone Interpreting Process',
-            field: 'telephoneProcess',
-            placeholder: 'Select Telephone interpreting process',
+            field: 'telephoneInterpretingProcess',
+            placeholder: 'Select Telephone interpre...',
             select: true,
-            options: selectOptions.telephoneProcess
+            options: selectOptions.telephoneInterpretingProcess
         },
+        // Row 5
         {
             label: 'TI Access Number',
             field: 'tiAccessNumber',
-            placeholder: 'Enter Access Number'
+            placeholder: 'Select TI Access number to ...'
         },
         {
             label: 'On Demand TI',
-            field: 'onDemandTi',
-            placeholder: 'Enter On Demand TI'
+            field: 'onDemandTI',
+            placeholder: 'Select On Demand Tl to fi...',
+            select: true,
+            options: selectOptions.onDemandTI
         },
         {
             label: 'Country',
             field: 'country',
-            placeholder: 'Select Country',
-            select: true,
-            options: selectOptions.country
-        },
-        {
-            label: 'Postcode',
-            field: 'postcode',
+            placeholder: 'Enter more than 3 charac...',
+            autocomplete: true
         }
     ]), []);
+
+    const renderField = (input: FieldInput) => (
+        <TextField
+            fullWidth
+            label={input.label}
+            placeholder={input.placeholder}
+            value={formValues[input.field]}
+            onChange={e => {
+                handleChange(input.field, e.target.value);
+            }}
+            select={Boolean(input.select)}
+            sx={{
+                '& .MuiInputBase-input': {
+                    fontSize: '12px'
+                },
+                '& .MuiInputLabel-root': {
+                    fontSize: '12px'
+                },
+                '& .MuiSelect-select': {
+                    fontSize: '12px'
+                }
+            }}
+            InputProps={input.autocomplete ? {
+                endAdornment: <i className="da da-chevron-down" style={{ cursor: 'pointer' }} />
+            } : undefined}
+        >
+            {input.select && input.options?.map(option => (
+                <MenuItem key={option.value} value={option.value} sx={{ fontSize: '12px' }}>
+                    {option.label}
+                </MenuItem>
+            ))}
+        </TextField>
+    );
 
     return (
         <Box
@@ -196,46 +252,13 @@ const ClientListFilter = forwardRef<ClientListFilterHandle>((_, ref) => {
                 sx={{
                     display: 'grid',
                     gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
-                    gap: 2
+                    gap: 2,
+                    mb: 3
                 }}
             >
-                {formFields.map((input) => (
+                {filterFields.map((input) => (
                     <Box key={input.field}>
-                        <TextField
-                            fullWidth
-                            label={input.label}
-                            placeholder={input.placeholder}
-                            value={formValues[input.field as keyof ClientListFilterValues]}
-                            onChange={e => {
-                                const nextValue = input.multiple
-                                    ? (typeof e.target.value === 'string'
-                                        ? e.target.value.split(',')
-                                        : e.target.value)
-                                    : e.target.value;
-                                handleChange(input.field as keyof ClientListFilterValues, nextValue);
-                            }}
-                            select={Boolean(input.select)}
-                            SelectProps={{
-                                multiple: input.multiple
-                            }}
-                            sx={{
-                                '& .MuiInputBase-input': {
-                                    fontSize: '12px'
-                                },
-                                '& .MuiInputLabel-root': {
-                                    fontSize: '12px'
-                                },
-                                '& .MuiSelect-select': {
-                                    fontSize: '12px'
-                                }
-                            }}
-                        >
-                            {input.select && input.options?.map(option => (
-                                <MenuItem key={option.value} value={option.value} sx={{ fontSize: '12px' }}>
-                                    {option.label}
-                                </MenuItem>
-                            ))}
-                        </TextField>
+                        {renderField(input)}
                     </Box>
                 ))}
             </Box>
@@ -246,3 +269,4 @@ const ClientListFilter = forwardRef<ClientListFilterHandle>((_, ref) => {
 ClientListFilter.displayName = 'ClientListFilter';
 
 export default ClientListFilter;
+
