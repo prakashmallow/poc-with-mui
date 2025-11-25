@@ -1,17 +1,17 @@
 'use client';
 
-import React from 'react';
 import {
+  Box,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
-  TableRow,
-  Paper,
   TablePagination,
-  Box,
+  TableRow
 } from '@mui/material';
+import React from 'react';
 
 export interface Column<T> {
   id: keyof T | string;
@@ -20,6 +20,11 @@ export interface Column<T> {
   align?: 'left' | 'right' | 'center';
   format?: (value: any, row: T) => React.ReactNode;
   renderCell?: (row: T) => React.ReactNode;
+  renderHeader?: () => React.ReactNode;
+  pinned?: 'left' | 'right';
+  sortable?: boolean;
+  sortDirection?: 'asc' | 'desc';
+  onSort?: () => void;
 }
 
 export interface CustomTableProps<T> {
@@ -63,55 +68,160 @@ function CustomTable<T extends Record<string, any>>({
     return (row as any).id ?? index;
   };
 
+  // Separate columns by pinning position
+  const leftPinnedColumns = columns.filter(col => col.pinned === 'left');
+  const rightPinnedColumns = columns.filter(col => col.pinned === 'right');
+  const unpinnedColumns = columns.filter(col => !col.pinned);
+
+  // Calculate left offset for left-pinned columns
+  const calculateLeftOffset = (columnIndex: number) => {
+    let offset = 0;
+    for (let i = 0; i < columnIndex; i++) {
+      offset += leftPinnedColumns[i]?.minWidth || 150;
+    }
+    return offset;
+  };
+
+  // Calculate right offset for right-pinned columns
+  const calculateRightOffset = (columnIndex: number) => {
+    let offset = 0;
+    for (let i = columnIndex + 1; i < rightPinnedColumns.length; i++) {
+      offset += rightPinnedColumns[i]?.minWidth || 150;
+    }
+    return offset;
+  };
+
+  const renderCell = (column: Column<T>, row: T, isHeader = false) => {
+    const isLeftPinned = column.pinned === 'left';
+    const isRightPinned = column.pinned === 'right';
+    const columnIndex = isLeftPinned
+      ? leftPinnedColumns.indexOf(column)
+      : isRightPinned
+        ? rightPinnedColumns.indexOf(column)
+        : -1;
+
+    const stickyStyles: React.CSSProperties = {};
+    if (isLeftPinned) {
+      stickyStyles.position = 'sticky';
+      stickyStyles.left = calculateLeftOffset(columnIndex);
+      stickyStyles.zIndex = isHeader ? 3 : 2;
+    } else if (isRightPinned) {
+      stickyStyles.position = 'sticky';
+      stickyStyles.right = calculateRightOffset(columnIndex);
+      stickyStyles.zIndex = isHeader ? 3 : 2;
+    }
+
+    if (isHeader) {
+      return (
+        <TableCell
+          key={String(column.id)}
+          align={column.align || 'left'}
+          style={{
+            minWidth: column.minWidth,
+            ...stickyStyles,
+          }}
+          sx={{
+            fontWeight: 600,
+            backgroundColor: stickyHeader || isLeftPinned || isRightPinned ? 'background.paper' : undefined,
+            ...((isLeftPinned || isRightPinned) && {
+              boxShadow: isLeftPinned
+                ? '2px 0 4px rgba(0,0,0,0.1)'
+                : '-2px 0 4px rgba(0,0,0,0.1)',
+            }),
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            {column.renderHeader ? column.renderHeader() : column.label}
+            {column.sortable && (
+              <Box
+                component="span"
+                onClick={column.onSort}
+                sx={{
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  fontSize: '10px',
+                  opacity: column.sortDirection ? 1 : 0.3,
+                  '&:hover': { opacity: 1 },
+                }}
+              >
+                <Box
+                  component="span"
+                  sx={{
+                    lineHeight: 0.7,
+                    color: column.sortDirection === 'asc' ? 'primary.main' : 'inherit',
+                  }}
+                >
+                  ▲
+                </Box>
+                <Box
+                  component="span"
+                  sx={{
+                    lineHeight: 0.7,
+                    color: column.sortDirection === 'desc' ? 'primary.main' : 'inherit',
+                  }}
+                >
+                  ▼
+                </Box>
+              </Box>
+            )}
+          </Box>
+        </TableCell>
+      );
+    }
+
+    const cellValue = column.id in row ? row[column.id as keyof T] : null;
+    let content: React.ReactNode;
+
+    if (column.renderCell) {
+      content = column.renderCell(row);
+    } else if (column.format) {
+      content = column.format(cellValue, row);
+    } else {
+      content = cellValue ?? '';
+    }
+
+    return (
+      <TableCell
+        key={String(column.id)}
+        align={column.align || 'left'}
+        style={stickyStyles}
+        sx={{
+          backgroundColor: (isLeftPinned || isRightPinned) ? 'background.paper' : undefined,
+          ...((isLeftPinned || isRightPinned) && {
+            boxShadow: isLeftPinned
+              ? '2px 0 4px rgba(0,0,0,0.1)'
+              : '-2px 0 4px rgba(0,0,0,0.1)',
+          }),
+        }}
+      >
+        {content}
+      </TableCell>
+    );
+  };
+
+  const allColumns = [...leftPinnedColumns, ...unpinnedColumns, ...rightPinnedColumns];
+
   return (
     <Paper className={className}>
-      <TableContainer sx={{ maxHeight: maxHeight }}>
+      <TableContainer sx={{ maxHeight: maxHeight, overflowX: 'auto' }}>
         <Table stickyHeader={stickyHeader} aria-label="custom table">
           <TableHead>
             <TableRow>
-              {columns.map((column) => (
-                <TableCell
-                  key={String(column.id)}
-                  align={column.align || 'left'}
-                  style={{ minWidth: column.minWidth }}
-                  sx={{
-                    fontWeight: 600,
-                    backgroundColor: stickyHeader ? 'background.paper' : undefined,
-                  }}
-                >
-                  {column.label}
-                </TableCell>
-              ))}
+              {allColumns.map((column) => renderCell(column, {} as T, true))}
             </TableRow>
           </TableHead>
           <TableBody>
             {displayRows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length} align="center" sx={{ py: 4 }}>
+                <TableCell colSpan={allColumns.length} align="center" sx={{ py: 4 }}>
                   {emptyMessage}
                 </TableCell>
               </TableRow>
             ) : (
               displayRows.map((row, index) => (
                 <TableRow hover key={getRowKey(row, index)}>
-                  {columns.map((column) => {
-                    const cellValue = column.id in row ? row[column.id as keyof T] : null;
-                    let content: React.ReactNode;
-
-                    if (column.renderCell) {
-                      content = column.renderCell(row);
-                    } else if (column.format) {
-                      content = column.format(cellValue, row);
-                    } else {
-                      content = cellValue ?? '';
-                    }
-
-                    return (
-                      <TableCell key={String(column.id)} align={column.align || 'left'}>
-                        {content}
-                      </TableCell>
-                    );
-                  })}
+                  {allColumns.map((column) => renderCell(column, row, false))}
                 </TableRow>
               ))
             )}
