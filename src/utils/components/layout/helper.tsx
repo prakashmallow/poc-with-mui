@@ -1,5 +1,6 @@
-import LinguistsListActions from '@/app/staff/linguists/LinguistListAction';
 import ClientsListActions from '@/app/staff/clients/ClientListAction';
+import LinguistsListActions from '@/app/staff/linguists/LinguistListAction';
+import { ClientEditHeaderTitle } from '@/components/staff/clients/ClientEditHeaderContent';
 import {
     basePathNames
 } from '@/utils/constants';
@@ -27,6 +28,13 @@ export const getSiteHeaderDetails = (
             title: 'Clients',
             children: <ClientsListActions />
         }
+    }
+    // Handle client edit route - use LinguistLayout with custom header
+    else if (pathName?.startsWith('/staff/clients/') && paths.length === 4) {
+        return {
+            title: <ClientEditHeaderTitle />,
+            children: null
+        };
     }
 
     return {};

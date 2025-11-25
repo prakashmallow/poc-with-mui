@@ -424,7 +424,6 @@ const Linguists = () => {
     };
 
     const handleScSort = () => {
-        debugger;
         setScSortDirection(prev => {
             if (prev === 'asc') return 'desc';
             if (prev === 'desc') return undefined;
@@ -464,6 +463,11 @@ const Linguists = () => {
                         indeterminate={selectedRows.size > 0 && selectedRows.size < linguists.length}
                         onChange={handleSelectAll}
                         size="small"
+                        slotProps={{
+                            input: {
+                                'aria-label': 'Select all linguists',
+                            },
+                        }}
                     />
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>Name</Typography>
                 </Box>
@@ -475,6 +479,11 @@ const Linguists = () => {
                         onChange={() => handleSelectRow(row.id)}
                         size="small"
                         onClick={(e) => e.stopPropagation()}
+                        slotProps={{
+                            input: {
+                                'aria-label': `Select ${row.name}`,
+                            },
+                        }}
                     />
                     <Typography variant="body2">{row.name}</Typography>
                 </Box>

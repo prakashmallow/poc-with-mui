@@ -3,6 +3,7 @@
 import CustomTable, { Column } from '@/components/shared/CustomTable';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Box, IconButton, Menu, MenuItem } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 interface Client {
@@ -14,6 +15,7 @@ interface Client {
 }
 
 const Clients = () => {
+  const router = useRouter();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -148,7 +150,9 @@ const Clients = () => {
   };
 
   const handleEdit = () => {
-    console.log('Edit client:', selectedClientId);
+    if (selectedClientId) {
+      router.push(`/staff/clients/${selectedClientId}`);
+    }
     handleMenuClose();
   };
 
