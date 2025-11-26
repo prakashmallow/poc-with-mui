@@ -8,11 +8,15 @@ import HistoryIcon from '@mui/icons-material/History';
 import HomeIcon from '@mui/icons-material/Home';
 import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { Box, Checkbox, Chip, FormControl, FormControlLabel, FormLabel, InputLabel, MenuItem, Paper, Select, Switch, TextField, Typography } from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import SectionHeader from './SectionHeader';
+import BillingAddressImportFileHistorySection from './BillingAddressImportFileHistorySection';
+import BillingAddressImportSection from './BillingAddressImportSection';
+import BillingAddressModal from './BillingAddressModal';
+import BillingAddressSection from './BillingAddressSection';
+import ProfileSection from './ProfileSection';
 
 interface SidebarItem {
     id: string;
@@ -39,9 +43,56 @@ const ClientEdit: React.FC = () => {
     const dispatch = useDispatch();
     const clientId = params?.id as string;
     const activeSection = searchParams.get('section') || 'profile';
+    const isImportFromUrl = searchParams.get('import') === 'true';
+    const isImportFileHistoryFromUrl = searchParams.get('import-history') === 'true';
+
+    // Sync import mode with URL
+    useEffect(() => {
+        if (isImportFromUrl && activeSection === 'billing-address') {
+            setIsImportMode(true);
+            setIsImportFileHistoryMode(false);
+        } else if (isImportFileHistoryFromUrl && activeSection === 'billing-address') {
+            setIsImportFileHistoryMode(true);
+            setIsImportMode(false);
+        } else {
+            setIsImportMode(false);
+            setIsImportFileHistoryMode(false);
+        }
+    }, [isImportFromUrl, isImportFileHistoryFromUrl, activeSection]);
 
     const clientDetails = useSelector((state: RootState) => state.clients.clientDetails);
     const clientLoading = useSelector((state: RootState) => state.clients.clientLoading);
+
+    // Billing Address section hooks - must be at top level
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(25);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [appliedFilters, setAppliedFilters] = useState<Record<string, unknown>>({});
+    const [isBillingAddressModalOpen, setIsBillingAddressModalOpen] = useState(false);
+    const [isImportMode, setIsImportMode] = useState(false);
+    const [isImportFileHistoryMode, setIsImportFileHistoryMode] = useState(false);
+    const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+    const [importHistoryPage, setImportHistoryPage] = useState(0);
+    const [importHistoryRowsPerPage, setImportHistoryRowsPerPage] = useState(25);
+
+    // Sample import file history data - replace with actual data from API/state
+    const [importHistoryData] = useState([
+        { id: '1', dateTime: '13/11/2025 11:23', fileName: 'billing_address.xlsx', user: 'Gayathri Muralitharan', importStatus: '0/0', fileStatus: 'Completed', hasError: false },
+        { id: '2', dateTime: '10/11/2025 04:30', fileName: 'billing_address (7).xlsx', user: 'Hari Prasad A', importStatus: '0/0', fileStatus: 'Completed', hasError: false },
+        { id: '3', dateTime: '30/10/2025 04:13', fileName: 'billing_address (6).xlsx', user: 'Ashley Taylor', importStatus: '0/1', fileStatus: 'Completed', hasError: true },
+        { id: '4', dateTime: '29/10/2025 13:44', fileName: 'billing_address_19303.xlsx', user: 'Ashley Taylor', importStatus: '1/2', fileStatus: 'Completed', hasError: true },
+        { id: '5', dateTime: '17/07/2025 10:49', fileName: 'SubContractor (1).xlsx', user: 'Ashley Taylor', importStatus: '0/1', fileStatus: 'Completed', hasError: true },
+        { id: '6', dateTime: '11/07/2025 11:22', fileName: 'billing_address_sample 7.xlsx', user: 'Bhvi mallow', importStatus: '3/8', fileStatus: 'Completed', hasError: true },
+    ]);
+    const [billingAddressFormData, setBillingAddressFormData] = useState({
+        name: '',
+        country: '',
+        postcode: '',
+        city: '',
+        addressLine1: '',
+        addressLine2: '',
+        addressLine3: '',
+    });
 
     const [formData, setFormData] = useState({
         accountStatus: 'Suspended',
@@ -158,380 +209,235 @@ const ClientEdit: React.FC = () => {
         });
     };
 
-    const renderProfileSection = () => {
-        const inputFontSize = { fontSize: '12px' };
-        const inputSx = {
-            ...inputFontSize,
-            '& .MuiInputBase-input': inputFontSize,
-            '& .MuiInputLabel-root': inputFontSize,
-            '& .MuiSelect-select': inputFontSize,
-            '& .MuiMenuItem-root': inputFontSize,
-            '& .MuiChip-label': inputFontSize,
-            '& .MuiFormLabel-root': inputFontSize,
-            '& .MuiFormControlLabel-label': inputFontSize,
-        };
 
-        return (
-            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-                {/* Fixed Profile Header */}
-                <SectionHeader
-                    title="Profile"
-                    onCancel={handleCancel}
-                    onUpdate={handleUpdate}
-                />
-                {/* Scrollable Content Area */}
-                <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
-                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 3, }}>
-                        {/* Left Column */}
-                        <Box>
-                            <FormControl fullWidth sx={{ mb: 2, ...inputSx }}>
-                                <InputLabel>Account Status *</InputLabel>
-                                <Select
-                                    value={formData.accountStatus}
-                                    label="Account Status *"
-                                    onChange={(e) => handleFieldChange('accountStatus', e.target.value)}
-                                >
-                                    <MenuItem value="Suspended">Suspended</MenuItem>
-                                    <MenuItem value="Active">Active</MenuItem>
-                                    <MenuItem value="Inactive">Inactive</MenuItem>
-                                </Select>
-                            </FormControl>
+    // Sample billing address data - replace with actual data from API/state
+    const [billingAddresses] = useState([
+        { id: '1', name: '', address: 'Kirkstall Ln' },
+        { id: '2', name: 'alrk Valley Community School', address: '10 Waterloo St, Leeds' },
+        { id: '3', name: 'alrk Valley Community School BKD', address: '10 Waterloo St' },
+        { id: '4', name: 'Connell Co-op College OCQ', address: '301 Alan Turing Way' },
+        { id: '5', name: 'Day Nursery at Bridgend CollegeSEG', address: 'Cowbridge Rd' },
+        { id: '6', name: 'Denton Community CollegeWPT', address: '16 Elm Grove, Denton' },
+        { id: '7', name: 'East High School', address: '123 Main St' },
+        { id: '8', name: 'West Elementary', address: '456 Oak Ave' },
+        { id: '9', name: 'North Middle School', address: '789 Pine Rd' },
+        { id: '10', name: 'South Academy', address: '321 Elm St' },
+        { id: '11', name: 'Central University', address: '654 Maple Dr' },
+        { id: '12', name: 'Tech Institute', address: '987 Cedar Ln' },
+        { id: '13', name: 'Business College', address: '147 Birch Way' },
+        { id: '14', name: 'Arts School', address: '258 Spruce Ave' },
+        { id: '15', name: 'Science Academy', address: '369 Willow St' },
+        { id: '16', name: 'Language Center', address: '741 Ash Rd' },
+        { id: '17', name: 'Music School', address: '852 Poplar Dr' },
+        { id: '18', name: 'Sports Academy', address: '963 Hickory Ln' },
+        { id: '19', name: 'Medical College', address: '159 Chestnut St' },
+        { id: '20', name: 'Law School', address: '357 Walnut Ave' },
+        { id: '21', name: 'Engineering Institute', address: '468 Sycamore Rd' },
+        { id: '22', name: 'Design College', address: '579 Magnolia Dr' },
+    ]);
 
-                            <FormControl fullWidth sx={{ mb: 2, ...inputSx }}>
-                                <InputLabel>Suspension Type *</InputLabel>
-                                <Select
-                                    value={formData.suspensionType}
-                                    label="Suspension Type *"
-                                    onChange={(e) => handleFieldChange('suspensionType', e.target.value)}
-                                >
-                                    <MenuItem value="General">General</MenuItem>
-                                    <MenuItem value="Temporary">Temporary</MenuItem>
-                                </Select>
-                            </FormControl>
-
-                            <TextField
-                                fullWidth
-                                label="Name *"
-                                value={formData.name}
-                                onChange={(e) => handleFieldChange('name', e.target.value)}
-                                sx={{ mb: 2, ...inputSx }}
-                            />
-
-                            <TextField
-                                fullWidth
-                                label="Prefix / Accounts Ref *"
-                                value={formData.prefixAccountRef}
-                                onChange={(e) => handleFieldChange('prefixAccountRef', e.target.value)}
-                                sx={{ mb: 2, ...inputSx }}
-                            />
-
-                            <FormControl fullWidth sx={{ mb: 2, ...inputSx }}>
-                                <InputLabel>Type *</InputLabel>
-                                <Select
-                                    value={formData.type}
-                                    label="Type *"
-                                    onChange={(e) => handleFieldChange('type', e.target.value)}
-                                >
-                                    <MenuItem value="Prospect">Prospect</MenuItem>
-                                    <MenuItem value="Client">Client</MenuItem>
-                                </Select>
-                            </FormControl>
-
-                            <TextField
-                                fullWidth
-                                label="Default Rate (Pence per min) *"
-                                value={formData.defaultRate}
-                                onChange={(e) => handleFieldChange('defaultRate', e.target.value)}
-                                sx={{ mb: 2, ...inputSx }}
-                            />
-
-                            <FormControl fullWidth sx={{ mb: 2, ...inputSx }}>
-                                <InputLabel>Sector *</InputLabel>
-                                <Select
-                                    value={formData.sector}
-                                    label="Sector *"
-                                    onChange={(e) => handleFieldChange('sector', e.target.value)}
-                                >
-                                    <MenuItem value="Public Sector">Public Sector</MenuItem>
-                                    <MenuItem value="Private Sector">Private Sector</MenuItem>
-                                </Select>
-                            </FormControl>
-
-                            <TextField
-                                fullWidth
-                                label="Contract / Purchase Order Number"
-                                value={formData.contractPurchaseOrderNumber}
-                                onChange={(e) => handleFieldChange('contractPurchaseOrderNumber', e.target.value)}
-                                sx={{ mb: 2, ...inputSx }}
-                            />
-
-                            <FormControl fullWidth sx={{ mb: 2, ...inputSx }}>
-                                <InputLabel>Consortium *</InputLabel>
-                                <Select
-                                    value={formData.consortium}
-                                    label="Consortium *"
-                                    onChange={(e) => handleFieldChange('consortium', e.target.value)}
-                                >
-                                    <MenuItem value="South West Police">South West Police</MenuItem>
-                                    <MenuItem value="Other">Other</MenuItem>
-                                </Select>
-                            </FormControl>
-
-                            <Box sx={{ mb: 2, ...inputSx }}>
-                                <FormLabel component="legend" sx={{ mb: 1, fontSize: '12px', color: 'text.primary' }}>
-                                    VRI Configurations
-                                </FormLabel>
-                                <FormControlLabel
-                                    control={
-                                        <Switch
-                                            checked={formData.vriLiveSupport}
-                                            onChange={(e) => handleFieldChange('vriLiveSupport', e.target.checked)}
-                                            color="success"
-                                        />
-                                    }
-                                    label="Live support : VRI Live Support"
-                                />
-                            </Box>
-                        </Box>
-
-                        {/* Middle Column */}
-                        <Box>
-                            <FormControl fullWidth sx={{ mb: 2, ...inputSx }}>
-                                <InputLabel>Industry *</InputLabel>
-                                <Select
-                                    value={formData.industry}
-                                    label="Industry *"
-                                    onChange={(e) => handleFieldChange('industry', e.target.value)}
-                                >
-                                    <MenuItem value="Central Government (e.g. Digital Cabinet Office, ...)">Central Government (e.g. Digital Cabinet Office, ...)</MenuItem>
-                                    <MenuItem value="Other">Other</MenuItem>
-                                </Select>
-                            </FormControl>
-
-                            <FormControl fullWidth sx={{ mb: 2, ...inputSx }}>
-                                <InputLabel>Appointment Type Category *</InputLabel>
-                                <Select
-                                    value={formData.appointmentTypeCategory}
-                                    label="Appointment Type Category *"
-                                    onChange={(e) => handleFieldChange('appointmentTypeCategory', e.target.value)}
-                                >
-                                    <MenuItem value="Adhoc">Adhoc</MenuItem>
-                                    <MenuItem value="Scheduled">Scheduled</MenuItem>
-                                </Select>
-                            </FormControl>
-
-                            <FormControl fullWidth sx={{ mb: 2, ...inputSx }}>
-                                <InputLabel>Available Services *</InputLabel>
-                                <Select
-                                    multiple
-                                    value={formData.availableServices}
-                                    label="Available Services *"
-                                    onChange={(e) => handleMultiSelectChange('availableServices', e.target.value as string[])}
-                                    renderValue={(selected) => (
-                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                            {(selected as string[]).map((value) => (
-                                                <Chip
-                                                    key={value}
-                                                    label={value}
-                                                    onDelete={() => handleChipDelete('availableServices', value)}
-                                                    size="small"
-                                                />
-                                            ))}
-                                        </Box>
-                                    )}
-                                >
-                                    <MenuItem value="Translation / Transcription">Translation / Transcription</MenuItem>
-                                    <MenuItem value="Telephone interpreting">Telephone interpreting</MenuItem>
-                                    <MenuItem value="Interpreting">Interpreting</MenuItem>
-                                    <MenuItem value="Video remote interpreting">Video remote interpreting</MenuItem>
-                                </Select>
-                            </FormControl>
-
-                            <FormControl fullWidth sx={{ mb: 2, ...inputSx }}>
-                                <InputLabel>Default Interpreter type *</InputLabel>
-                                <Select
-                                    value={formData.defaultInterpreterType}
-                                    label="Default Interpreter type *"
-                                    onChange={(e) => handleFieldChange('defaultInterpreterType', e.target.value)}
-                                >
-                                    <MenuItem value="Trainee Sign Language Interpreters (TSLI)">Trainee Sign Language Interpreters (TSLI)</MenuItem>
-                                    <MenuItem value="Other">Other</MenuItem>
-                                </Select>
-                            </FormControl>
-
-                            <FormControl fullWidth sx={{ mb: 2, ...inputSx }}>
-                                <InputLabel>Language Type *</InputLabel>
-                                <Select
-                                    multiple
-                                    value={formData.languageType}
-                                    label="Language Type *"
-                                    onChange={(e) => handleMultiSelectChange('languageType', e.target.value as string[])}
-                                    renderValue={(selected) => (
-                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                            {(selected as string[]).map((value) => (
-                                                <Chip
-                                                    key={value}
-                                                    label={value}
-                                                    onDelete={() => handleChipDelete('languageType', value)}
-                                                    size="small"
-                                                />
-                                            ))}
-                                        </Box>
-                                    )}
-                                >
-                                    <MenuItem value="Sign">Sign</MenuItem>
-                                    <MenuItem value="Spoken">Spoken</MenuItem>
-                                </Select>
-                            </FormControl>
-
-                            <FormControl fullWidth sx={{ mb: 2, ...inputSx }}>
-                                <InputLabel>Telephone Interpreting Process *</InputLabel>
-                                <Select
-                                    value={formData.telephoneInterpretingProcess}
-                                    label="Telephone Interpreting Process *"
-                                    onChange={(e) => handleFieldChange('telephoneInterpretingProcess', e.target.value)}
-                                >
-                                    <MenuItem value="Automation">Automation</MenuItem>
-                                    <MenuItem value="Manual">Manual</MenuItem>
-                                </Select>
-                            </FormControl>
-
-                            <TextField
-                                fullWidth
-                                label="TI Access Number *"
-                                value={formData.tiAccessNumber}
-                                onChange={(e) => handleFieldChange('tiAccessNumber', e.target.value)}
-                                sx={{ mb: 2, ...inputSx }}
-                            />
-
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={formData.onDemandTIOnly}
-                                        onChange={(e) => handleFieldChange('onDemandTIOnly', e.target.checked)}
-                                    />
-                                }
-                                label="On Demand TI only"
-                                sx={{ mb: 2, ...inputSx }}
-                            />
-
-                            <TextField
-                                fullWidth
-                                label="Client Master Email"
-                                value={formData.clientMasterEmail}
-                                onChange={(e) => handleFieldChange('clientMasterEmail', e.target.value)}
-                                sx={{ mb: 2, ...inputSx }}
-                            />
-
-                            <TextField
-                                fullWidth
-                                label="Translation / Transcription Service Email *"
-                                value={formData.translationTranscriptionServiceEmail}
-                                onChange={(e) => handleFieldChange('translationTranscriptionServiceEmail', e.target.value)}
-                                sx={{ mb: 2, ...inputSx }}
-                            />
-                        </Box>
-
-                        {/* Right Column */}
-                        <Box>
-                            <TextField
-                                fullWidth
-                                label="Spoken Interpreting Service Email *"
-                                value={formData.spokenInterpretingServiceEmail}
-                                onChange={(e) => handleFieldChange('spokenInterpretingServiceEmail', e.target.value)}
-                                sx={{ mb: 2, ...inputSx }}
-                            />
-
-                            <TextField
-                                fullWidth
-                                label="Non Spoken Interpreting Service Email *"
-                                value={formData.nonSpokenInterpretingServiceEmail}
-                                onChange={(e) => handleFieldChange('nonSpokenInterpretingServiceEmail', e.target.value)}
-                                sx={{ mb: 2, ...inputSx }}
-                            />
-
-                            <FormControl fullWidth sx={{ mb: 2, ...inputSx }}>
-                                <InputLabel>Provider Sales Manager</InputLabel>
-                                <Select
-                                    value={formData.providerSalesManager}
-                                    label="Provider Sales Manager"
-                                    onChange={(e) => handleFieldChange('providerSalesManager', e.target.value)}
-                                >
-                                    <MenuItem value="Anxxxxxxxx Samxxxx">Anxxxxxxxx Samxxxx</MenuItem>
-                                    <MenuItem value="Other">Other</MenuItem>
-                                </Select>
-                            </FormControl>
-
-                            <FormControl fullWidth sx={{ mb: 2, ...inputSx }}>
-                                <InputLabel>Provider Account Manager</InputLabel>
-                                <Select
-                                    value={formData.providerAccountManager}
-                                    label="Provider Account Manager"
-                                    onChange={(e) => handleFieldChange('providerAccountManager', e.target.value)}
-                                >
-                                    <MenuItem value="Vixxx Ramxxxx">Vixxx Ramxxxx</MenuItem>
-                                    <MenuItem value="Other">Other</MenuItem>
-                                </Select>
-                            </FormControl>
-
-                            <FormControl fullWidth sx={{ mb: 2, ...inputSx }}>
-                                <InputLabel>Country</InputLabel>
-                                <Select
-                                    value={formData.country}
-                                    label="Country"
-                                    onChange={(e) => handleFieldChange('country', e.target.value)}
-                                >
-                                    <MenuItem value="India">India</MenuItem>
-                                    <MenuItem value="UK">UK</MenuItem>
-                                    <MenuItem value="USA">USA</MenuItem>
-                                </Select>
-                            </FormControl>
-
-                            <TextField
-                                fullWidth
-                                label="Postcode"
-                                value={formData.postcode}
-                                onChange={(e) => handleFieldChange('postcode', e.target.value)}
-                                sx={{ mb: 2, ...inputSx }}
-                            />
-
-                            <TextField
-                                fullWidth
-                                label="Location"
-                                value={formData.location}
-                                onChange={(e) => handleFieldChange('location', e.target.value)}
-                                sx={{ mb: 2, ...inputSx }}
-                            />
-
-                            <TextField
-                                fullWidth
-                                label="Main Telephone"
-                                value={formData.mainTelephone}
-                                onChange={(e) => handleFieldChange('mainTelephone', e.target.value)}
-                                sx={{ mb: 2, ...inputSx }}
-                            />
-                        </Box>
-                    </Box>
-                    <TextField
-                        fullWidth
-                        label="Notes"
-                        value={formData.notes}
-                        onChange={(e) => handleFieldChange('notes', e.target.value)}
-                        multiline
-                        rows={4}
-                        sx={{ ...inputSx }}
-                    />
-                </Box>
-            </Box>
-        );
+    const handlePageChange = (event: unknown, newPage: number) => {
+        setPage(newPage);
     };
 
+    const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
+    const handleExport = () => {
+        console.log('Export billing addresses');
+    };
+
+    const handleImport = () => {
+        setIsImportMode(true);
+        router.push(`/staff/clients/${clientId}?section=billing-address&import=true`);
+    };
+
+    const handleBackToBillingAddressList = () => {
+        setIsImportMode(false);
+        setUploadedFile(null);
+        router.push(`/staff/clients/${clientId}?section=billing-address`);
+    };
+
+    const handleImportFileHistory = () => {
+        setIsImportFileHistoryMode(true);
+        router.push(`/staff/clients/${clientId}?section=billing-address&import-history=true`);
+    };
+
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setUploadedFile(file);
+        }
+    };
+
+    const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault();
+        const file = event.dataTransfer.files[0];
+        if (file) {
+            setUploadedFile(file);
+        }
+    };
+
+    const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault();
+    };
+
+    const handleDownloadSample = () => {
+        console.log('Download sample file');
+        // TODO: Implement sample file download
+    };
+
+    const handleImportSubmit = () => {
+        if (uploadedFile) {
+            console.log('Import file:', uploadedFile);
+            // TODO: Implement file import logic
+        }
+    };
+
+    const handleNewBillingAddress = () => {
+        setIsBillingAddressModalOpen(true);
+    };
+
+    const handleCloseBillingAddressModal = () => {
+        setIsBillingAddressModalOpen(false);
+        setBillingAddressFormData({
+            name: '',
+            country: '',
+            postcode: '',
+            city: '',
+            addressLine1: '',
+            addressLine2: '',
+            addressLine3: '',
+        });
+    };
+
+    const handleBillingAddressFieldChange = (field: string, value: string) => {
+        setBillingAddressFormData(prev => ({
+            ...prev,
+            [field]: value,
+        }));
+    };
+
+    const handleSubmitBillingAddress = () => {
+        // TODO: Implement submit logic
+        console.log('Submit billing address:', billingAddressFormData);
+        handleCloseBillingAddressModal();
+    };
+
+    const handleEdit = (id: string) => {
+        console.log('Edit billing address:', id);
+    };
+
+    const updateFilterVisibility = (visible?: boolean) => {
+        setIsFilterOpen(prev => (typeof visible === 'boolean' ? visible : !prev));
+    };
+
+    const handleResetFilters = () => {
+        setAppliedFilters({});
+    };
+
+    const handleApplyFilters = () => {
+        // Apply filters logic
+        updateFilterVisibility(false);
+    };
+
+
+
+    const handleImportHistoryPageChange = (event: unknown, newPage: number) => {
+        setImportHistoryPage(newPage);
+    };
+
+    const handleImportHistoryRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setImportHistoryRowsPerPage(parseInt(event.target.value, 10));
+        setImportHistoryPage(0);
+    };
+
+    const handleBackToBillingAddressListFromHistory = () => {
+        setIsImportFileHistoryMode(false);
+        router.push(`/staff/clients/${clientId}?section=billing-address`);
+    };
+
+    const handleDownloadError = (id: string) => {
+        console.log('Download error details for:', id);
+        // TODO: Implement error download
+    };
+
+    const handleFileNameClick = (fileName: string) => {
+        console.log('Download file:', fileName);
+        // TODO: Implement file download
+    };
+
+    const clientName = clientDetails?.name || formData?.name || 'Elijah Suarez';
+    const totalImportHistoryRows = 209; // Total from API
+
     const renderContent = () => {
+        // Show import file history section if in import file history mode and billing address section is active
+        if (activeSection === 'billing-address' && isImportFileHistoryMode) {
+            return (
+                <BillingAddressImportFileHistorySection
+                    importHistoryData={importHistoryData}
+                    page={importHistoryPage}
+                    rowsPerPage={importHistoryRowsPerPage}
+                    totalRows={totalImportHistoryRows}
+                    onPageChange={handleImportHistoryPageChange}
+                    onRowsPerPageChange={handleImportHistoryRowsPerPageChange}
+                    onBackToBillingAddressList={handleBackToBillingAddressListFromHistory}
+                    onDownloadError={handleDownloadError}
+                    onFileNameClick={handleFileNameClick}
+                />
+            );
+        }
+
+        // Show import section if in import mode and billing address section is active
+        if (activeSection === 'billing-address' && isImportMode) {
+            return (
+                <BillingAddressImportSection
+                    clientName={clientName}
+                    uploadedFile={uploadedFile}
+                    onBackToBillingAddressList={handleBackToBillingAddressList}
+                    onImportFileHistory={handleImportFileHistory}
+                    onFileUpload={handleFileUpload}
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    onDownloadSample={handleDownloadSample}
+                    onImportSubmit={handleImportSubmit}
+                />
+            );
+        }
+
         switch (activeSection) {
             case 'profile':
-                return renderProfileSection();
+                return (
+                    <ProfileSection
+                        formData={formData}
+                        onFieldChange={handleFieldChange}
+                        onMultiSelectChange={handleMultiSelectChange}
+                        onChipDelete={handleChipDelete}
+                        onCancel={handleCancel}
+                        onUpdate={handleUpdate}
+                    />
+                );
             case 'billing-address':
-                return <Box sx={{ p: 3 }}><Typography variant="h6">Billing Address</Typography></Box>;
+                return (
+                    <BillingAddressSection
+                        billingAddresses={billingAddresses}
+                        page={page}
+                        rowsPerPage={rowsPerPage}
+                        isFilterOpen={isFilterOpen}
+                        appliedFilters={appliedFilters}
+                        onPageChange={handlePageChange}
+                        onRowsPerPageChange={handleRowsPerPageChange}
+                        onExport={handleExport}
+                        onImport={handleImport}
+                        onNewBillingAddress={handleNewBillingAddress}
+                        onEdit={handleEdit}
+                        updateFilterVisibility={updateFilterVisibility}
+                        onResetFilters={handleResetFilters}
+                        onApplyFilters={handleApplyFilters}
+                    />
+                );
             case 'division':
                 return <Box sx={{ p: 3 }}><Typography variant="h6">Division</Typography></Box>;
             case 'department':
@@ -547,7 +453,16 @@ const ClientEdit: React.FC = () => {
             case 'configurations':
                 return <Box sx={{ p: 3 }}><Typography variant="h6">Configurations</Typography></Box>;
             default:
-                return renderProfileSection();
+                return (
+                    <ProfileSection
+                        formData={formData}
+                        onFieldChange={handleFieldChange}
+                        onMultiSelectChange={handleMultiSelectChange}
+                        onChipDelete={handleChipDelete}
+                        onCancel={handleCancel}
+                        onUpdate={handleUpdate}
+                    />
+                );
         }
     };
 
@@ -592,6 +507,15 @@ const ClientEdit: React.FC = () => {
                     {renderContent()}
                 </Paper>
             </Box>
+
+            {/* Billing Address Modal */}
+            <BillingAddressModal
+                open={isBillingAddressModalOpen}
+                formData={billingAddressFormData}
+                onClose={handleCloseBillingAddressModal}
+                onSubmit={handleSubmitBillingAddress}
+                onFieldChange={handleBillingAddressFieldChange}
+            />
         </Box>
     );
 };

@@ -16,6 +16,11 @@ const store = configureStore({
       serializableCheck: {
         // Ignore these action types for serialization check
         ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+        // Ignore these paths in the state that contain non-serializable values (functions)
+        ignoredPaths: [
+          'modals.actionConfirmDetails.confirmCallback',
+          'modals.formModalDetails.formSubmitCallback',
+        ],
       },
     }).concat(sagaMiddleware),
   devTools: ![
