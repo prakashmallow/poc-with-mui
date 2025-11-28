@@ -1,18 +1,19 @@
 'use client';
 import { RootState } from '@/redux/store';
 import { useSelector } from 'react-redux';
+
 type HeaderDetails = {
     title?: string | React.ReactNode;
     children?: React.ReactNode;
     breadCrumbItems?: any[];
 };
 
-interface LinguistLayoutProps {
+interface LinguistEditHeaderLayoutProps {
     children?: React.ReactNode;
     headerDetails?: HeaderDetails;
 }
 
-const LinguistLayout: React.FC<LinguistLayoutProps> = ({
+const LinguistEditHeaderLayout: React.FC<LinguistEditHeaderLayoutProps> = ({
     children,
     headerDetails
 }) => {
@@ -23,6 +24,7 @@ const LinguistLayout: React.FC<LinguistLayoutProps> = ({
         title,
         children: siteHeaderChildren
     }: HeaderDetails = headerDetails || {};
+    
     return (
         <div>
             <div
@@ -47,4 +49,5 @@ const LinguistLayout: React.FC<LinguistLayoutProps> = ({
     );
 };
 
-export default LinguistLayout;
+export default LinguistEditHeaderLayout;
+
