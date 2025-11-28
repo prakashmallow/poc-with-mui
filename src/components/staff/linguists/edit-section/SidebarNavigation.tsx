@@ -67,7 +67,8 @@ const SidebarNavigation: React.FC = () => {
   return (
     <Box
       sx={{
-        width: 290,
+        width: 250,
+        flexShrink: 0,
         bgcolor: 'white',
         borderRight: '1px solid #e0e0e0',
         display: 'flex',

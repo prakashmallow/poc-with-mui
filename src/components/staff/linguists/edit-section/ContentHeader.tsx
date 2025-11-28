@@ -28,7 +28,7 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, paddingBottom: 2, borderBottom: '1px solid #e0e0e0' }}>
-      <Typography variant="h6" sx={{ fontWeight: 600, color: '#1e285f' }}>
+      <Typography variant="h6" sx={{ fontWeight: 600, color: '#1e285f', fontSize: 22 }}>
         {title}
       </Typography>
       {hasActions && (
@@ -59,11 +59,7 @@ const ContentHeader: React.FC<ContentHeaderProps> = ({
               onClick={onSave}
               sx={{
                 textTransform: 'none',
-                fontWeight: 600,
-                bgcolor: '#1a237e',
-                '&:hover': {
-                  bgcolor: '#0d1642',
-                },
+                fontWeight: 600
               }}
             >
               SAVE

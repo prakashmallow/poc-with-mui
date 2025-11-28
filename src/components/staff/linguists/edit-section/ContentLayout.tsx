@@ -22,7 +22,7 @@ const ContentLayout: React.FC<ContentLayoutProps> = ({
   return (
     <>
       {/* Fixed Header */}
-      <Box sx={{ flexShrink: 0, p: 4, pb: 2 }}>
+      <Box sx={{ flexShrink: 0, p: 2 }}>
         <ContentHeader 
           title={title} 
           onSave={onSave} 
@@ -36,7 +36,7 @@ const ContentLayout: React.FC<ContentLayoutProps> = ({
         sx={{ 
           flex: 1, 
           overflowY: 'auto', 
-          px: 4, 
+          px: 2, 
           pb: 4,
           '&::-webkit-scrollbar': {
             width: '8px',

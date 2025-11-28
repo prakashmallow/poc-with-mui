@@ -11,6 +11,8 @@ import {
   FormControl,
   Select,
   MenuItem,
+  FormControlLabel,
+  Checkbox,
   Box,
   Typography,
   IconButton,
@@ -19,38 +21,38 @@ import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 import FileUpload from "../common/FileUpload";
 
-export interface SecurityClearanceData {
-  type: string;
-  issueDate: string;
+export interface RightToWorkData {
+  rightToWork: string;
   expiryDate: string;
+  indefiniteLeave: boolean;
   file?: File | null;
 }
 
-interface AddSecurityClearanceModalProps {
+interface AddRightToWorkModalProps {
   open: boolean;
   onClose: () => void;
-  onSave: (data: SecurityClearanceData) => void;
+  onSave: (data: RightToWorkData) => void;
 }
 
-const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
+const AddRightToWorkModal: React.FC<AddRightToWorkModalProps> = ({
   open,
   onClose,
   onSave,
 }) => {
-  const [formData, setFormData] = useState<SecurityClearanceData>({
-    type: "",
-    issueDate: "",
+  const [formData, setFormData] = useState<RightToWorkData>({
+    rightToWork: "",
     expiryDate: "",
+    indefiniteLeave: false,
     file: null,
   });
   const [triggerValidation, setTriggerValidation] = useState(false);
 
-  const handleChange = (field: keyof SecurityClearanceData, value: any) => {
+  const handleChange = (field: keyof RightToWorkData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = () => {
-    if (!formData.type || !formData.issueDate || !formData.file) {
+    if (!formData.rightToWork || !formData.expiryDate || !formData.file) {
       setTriggerValidation(true);
       return;
     }
@@ -65,9 +67,9 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
 
   const handleClose = () => {
     setFormData({
-      type: "",
-      issueDate: "",
+      rightToWork: "",
       expiryDate: "",
+      indefiniteLeave: false,
       file: null,
     });
     setTriggerValidation(false);
@@ -79,15 +81,16 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
       open={open}
       onClose={handleClose}
       sx={{
-        '& .MuiDialog-container': {
-          alignItems: 'flex-start',
-          paddingTop: '10vh',
+        "& .MuiDialog-container": {
+          alignItems: "flex-start",
+          paddingTop: "10vh",
         },
       }}
       PaperProps={{
         sx: { borderRadius: 2, width: 450, margin: 0 },
       }}
     >
+      {/* HEADER */}
       <DialogTitle
         sx={{
           display: "flex",
@@ -98,7 +101,7 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
           color: "#1e285f",
         }}
       >
-        Security clearance
+        Right to Work
         <IconButton onClick={handleClose} size="small">
           <CloseIcon />
         </IconButton>
@@ -107,7 +110,7 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
       {/* BODY */}
       <DialogContent sx={{ mt: 3, mb: 2 }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-          {/* Security clearance */}
+          {/* Right to work */}
           <Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
               <Typography
@@ -117,29 +120,31 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
                   color: "#1e285f",
                 }}
               >
-                Security clearance
+                Right to work
               </Typography>
               <Typography sx={{ color: "#d32f2f", fontSize: 14 }}>*</Typography>
-
             </Box>
             <FormControl fullWidth size="small">
               <Select
-                value={formData.type}
-                onChange={(e) => handleChange("type", e.target.value)}
+                value={formData.rightToWork}
+                onChange={(e) => handleChange("rightToWork", e.target.value)}
                 displayEmpty
               >
                 <MenuItem value="" disabled>
-                  Select Security clearance
+                  Select Right to work
                 </MenuItem>
-                <MenuItem value="BPSS">BPSS (Baseline Personnel Security Standard)</MenuItem>
-                <MenuItem value="CTC">CTC (Counter Terrorist Check)</MenuItem>
-                <MenuItem value="SC">SC (Security Check)</MenuItem>
-                <MenuItem value="DV">DV (Developed Vetting)</MenuItem>
+                <MenuItem value="UK Citizen">UK Citizen</MenuItem>
+                <MenuItem value="EU Settled Status">EU Settled Status</MenuItem>
+                <MenuItem value="EU Pre-Settled Status">EU Pre-Settled Status</MenuItem>
+                <MenuItem value="Work Visa">Work Visa</MenuItem>
+                <MenuItem value="Student Visa">Student Visa</MenuItem>
+                <MenuItem value="Dependent Visa">Dependent Visa</MenuItem>
+                <MenuItem value="Other">Other</MenuItem>
               </Select>
             </FormControl>
           </Box>
 
-          {/* Start Date */}
+          {/* Right to work - Expiry date */}
           <Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
               <Typography
@@ -149,31 +154,7 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
                   color: "#1e285f",
                 }}
               >
-                Start date
-              </Typography>
-              <Typography sx={{ color: "#d32f2f", fontSize: 14 }}>*</Typography>
-            </Box>
-            <TextField
-              fullWidth
-              size="small"
-              type="date"
-              value={formData.issueDate}
-              onChange={(e) => handleChange("issueDate", e.target.value)}
-              placeholder="Select Start date"
-            />
-          </Box>
-
-          {/* End Date */}
-          <Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
-              <Typography
-                sx={{
-                  fontSize: 14,
-                  fontWeight: 500,
-                  color: "#1e285f",
-                }}
-              >
-                End date
+                Right to work - Expiry date
               </Typography>
               <Typography sx={{ color: "#d32f2f", fontSize: 14 }}>*</Typography>
             </Box>
@@ -183,9 +164,26 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
               type="date"
               value={formData.expiryDate}
               onChange={(e) => handleChange("expiryDate", e.target.value)}
-              placeholder="Select End date"
+              placeholder="Select Expiry date"
             />
           </Box>
+
+          {/* Checkbox */}
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={formData.indefiniteLeave}
+                onChange={(e) => handleChange("indefiniteLeave", e.target.checked)}
+              />
+            }
+            label="I have indefinite leave to remain in the UK"
+            sx={{
+              "& .MuiFormControlLabel-label": {
+                fontSize: 14,
+                color: "#1e285f",
+              },
+            }}
+          />
 
           {/* File Upload */}
           <FileUpload 
@@ -225,7 +223,7 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
         <Button
           onClick={handleSave}
           variant="contained"
-          disabled={!formData.type || !formData.issueDate || !formData.file}
+          disabled={!formData.rightToWork || !formData.expiryDate || !formData.file}
           sx={{
             textTransform: "none",
             fontWeight: 600,
@@ -241,4 +239,5 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
   );
 };
 
-export default AddSecurityClearanceModal;
+export default AddRightToWorkModal;
+

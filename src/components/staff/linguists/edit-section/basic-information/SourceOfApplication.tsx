@@ -17,7 +17,7 @@ interface SourceOfApplicationProps {
 
 const SourceOfApplication: React.FC<SourceOfApplicationProps> = ({ value, onChange }) => {
   return (
-    <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: 'white', mt: 4 }}>
+    <Paper elevation={0} sx={{ p: 2, borderRadius: 2, bgcolor: 'white', mt: 2 }}>
       <Typography sx={{ color: '#1e285f', mb: 4, borderBottom: '1px solid #e0e0e0', pb: 2 }}>
         Source of application
       </Typography>

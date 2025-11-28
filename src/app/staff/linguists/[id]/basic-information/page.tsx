@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { getLinguistById } from '@/utils/linguistData';
 import { Box } from '@mui/material';
 
 // Import components from components folder
 import ContentLayout from '@/components/staff/linguists/edit-section/ContentLayout';
-import BasicInformation from '@/components/staff/linguists/edit-section/basic-information/BasicInformation';
+import BasicInformation, { BasicInformationRef } from '@/components/staff/linguists/edit-section/basic-information/BasicInformation';
 import AddressDetails from '@/components/staff/linguists/edit-section/basic-information/AddressDetails';
 import ContactInformation from '@/components/staff/linguists/edit-section/basic-information/ContactInformation';
 import NationalInsuranceSection from '@/components/staff/linguists/edit-section/basic-information/NationalInsuranceSection';
@@ -42,6 +42,8 @@ export default function BasicInformationPage() {
   });
 
   const [sourceOfApplication, setSourceOfApplication] = useState<string>('Dals');
+  const [photo, setPhoto] = useState<File | null>(null);
+  const basicInformationRef = useRef<BasicInformationRef>(null);
 
   useEffect(() => {
     if (linguist) {
@@ -64,13 +66,18 @@ export default function BasicInformationPage() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = () => {
-    console.log('Saving linguist data:', formData);
+  const handleSave = async () => {
+    // Validate using Zod schema
+    const isValid = await basicInformationRef.current?.validate();
+    if (!isValid) {
+      return;
+    }
+    console.log('Saving linguist data:', formData, photo);
     // Add your save logic here
   };
 
   const handleCancel = () => {
-    router.back();
+    router.push(`/staff/linguists`);
   };
 
   if (!linguist) {
@@ -89,7 +96,13 @@ export default function BasicInformationPage() {
       onSave={handleSave} 
       onCancel={handleCancel}
     >
-      <BasicInformation formData={formData} onFieldChange={handleFieldChange} />
+      <BasicInformation 
+        ref={basicInformationRef}
+        formData={formData} 
+        onFieldChange={handleFieldChange}
+        photo={photo}
+        onPhotoChange={setPhoto}
+      />
       <AddressDetails />
       <ContactInformation />
       <NationalInsuranceSection />

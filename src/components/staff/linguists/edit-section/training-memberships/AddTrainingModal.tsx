@@ -8,9 +8,6 @@ import {
   DialogActions,
   Button,
   TextField,
-  FormControl,
-  Select,
-  MenuItem,
   Box,
   Typography,
   IconButton,
@@ -19,38 +16,34 @@ import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 import FileUpload from "../common/FileUpload";
 
-export interface SecurityClearanceData {
-  type: string;
-  issueDate: string;
-  expiryDate: string;
+export interface TrainingData {
+  trainingCourseName: string;
   file?: File | null;
 }
 
-interface AddSecurityClearanceModalProps {
+interface AddTrainingModalProps {
   open: boolean;
   onClose: () => void;
-  onSave: (data: SecurityClearanceData) => void;
+  onSave: (data: TrainingData) => void;
 }
 
-const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
+const AddTrainingModal: React.FC<AddTrainingModalProps> = ({
   open,
   onClose,
   onSave,
 }) => {
-  const [formData, setFormData] = useState<SecurityClearanceData>({
-    type: "",
-    issueDate: "",
-    expiryDate: "",
+  const [formData, setFormData] = useState<TrainingData>({
+    trainingCourseName: "",
     file: null,
   });
   const [triggerValidation, setTriggerValidation] = useState(false);
 
-  const handleChange = (field: keyof SecurityClearanceData, value: any) => {
+  const handleChange = (field: keyof TrainingData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = () => {
-    if (!formData.type || !formData.issueDate || !formData.file) {
+    if (!formData.trainingCourseName.trim() || !formData.file) {
       setTriggerValidation(true);
       return;
     }
@@ -65,9 +58,7 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
 
   const handleClose = () => {
     setFormData({
-      type: "",
-      issueDate: "",
-      expiryDate: "",
+      trainingCourseName: "",
       file: null,
     });
     setTriggerValidation(false);
@@ -79,15 +70,16 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
       open={open}
       onClose={handleClose}
       sx={{
-        '& .MuiDialog-container': {
-          alignItems: 'flex-start',
-          paddingTop: '10vh',
+        "& .MuiDialog-container": {
+          alignItems: "flex-start",
+          paddingTop: "10vh",
         },
       }}
       PaperProps={{
         sx: { borderRadius: 2, width: 450, margin: 0 },
       }}
     >
+      {/* HEADER */}
       <DialogTitle
         sx={{
           display: "flex",
@@ -98,7 +90,7 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
           color: "#1e285f",
         }}
       >
-        Security clearance
+        Continuous professional development
         <IconButton onClick={handleClose} size="small">
           <CloseIcon />
         </IconButton>
@@ -107,83 +99,26 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
       {/* BODY */}
       <DialogContent sx={{ mt: 3, mb: 2 }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-          {/* Security clearance */}
+          {/* What is the name of the training course you have completed? */}
           <Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
               <Typography
                 sx={{
-                  fontSize: 14,
+                  fontSize: 12,
                   fontWeight: 500,
                   color: "#1e285f",
                 }}
               >
-                Security clearance
-              </Typography>
-              <Typography sx={{ color: "#d32f2f", fontSize: 14 }}>*</Typography>
-
-            </Box>
-            <FormControl fullWidth size="small">
-              <Select
-                value={formData.type}
-                onChange={(e) => handleChange("type", e.target.value)}
-                displayEmpty
-              >
-                <MenuItem value="" disabled>
-                  Select Security clearance
-                </MenuItem>
-                <MenuItem value="BPSS">BPSS (Baseline Personnel Security Standard)</MenuItem>
-                <MenuItem value="CTC">CTC (Counter Terrorist Check)</MenuItem>
-                <MenuItem value="SC">SC (Security Check)</MenuItem>
-                <MenuItem value="DV">DV (Developed Vetting)</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-
-          {/* Start Date */}
-          <Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
-              <Typography
-                sx={{
-                  fontSize: 14,
-                  fontWeight: 500,
-                  color: "#1e285f",
-                }}
-              >
-                Start date
+                What is the name of the training course you have completed?
               </Typography>
               <Typography sx={{ color: "#d32f2f", fontSize: 14 }}>*</Typography>
             </Box>
             <TextField
               fullWidth
               size="small"
-              type="date"
-              value={formData.issueDate}
-              onChange={(e) => handleChange("issueDate", e.target.value)}
-              placeholder="Select Start date"
-            />
-          </Box>
-
-          {/* End Date */}
-          <Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
-              <Typography
-                sx={{
-                  fontSize: 14,
-                  fontWeight: 500,
-                  color: "#1e285f",
-                }}
-              >
-                End date
-              </Typography>
-              <Typography sx={{ color: "#d32f2f", fontSize: 14 }}>*</Typography>
-            </Box>
-            <TextField
-              fullWidth
-              size="small"
-              type="date"
-              value={formData.expiryDate}
-              onChange={(e) => handleChange("expiryDate", e.target.value)}
-              placeholder="Select End date"
+              value={formData.trainingCourseName}
+              onChange={(e) => handleChange("trainingCourseName", e.target.value)}
+              placeholder="Enter training course name"
             />
           </Box>
 
@@ -225,7 +160,7 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
         <Button
           onClick={handleSave}
           variant="contained"
-          disabled={!formData.type || !formData.issueDate || !formData.file}
+          disabled={!formData.trainingCourseName.trim() || !formData.file}
           sx={{
             textTransform: "none",
             fontWeight: 600,
@@ -241,4 +176,5 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
   );
 };
 
-export default AddSecurityClearanceModal;
+export default AddTrainingModal;
+

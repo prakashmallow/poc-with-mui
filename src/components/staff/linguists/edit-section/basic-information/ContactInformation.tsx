@@ -14,7 +14,7 @@ import {
 const ContactInformation: React.FC = () => {
   return (
     <>
-      <Paper elevation={0} sx={{ p: 4, borderRadius: 2, bgcolor: 'white' }}>
+      <Paper elevation={0} sx={{mt: 2, p: 4, borderRadius: 2, bgcolor: 'white' }}>
         <Typography sx={{ color: '#1e285f' }}>
           Contact Information
         </Typography>

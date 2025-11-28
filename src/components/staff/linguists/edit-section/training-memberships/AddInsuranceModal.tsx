@@ -19,38 +19,38 @@ import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 import FileUpload from "../common/FileUpload";
 
-export interface SecurityClearanceData {
-  type: string;
-  issueDate: string;
-  expiryDate: string;
+export interface InsuranceData {
+  insurance: string;
+  startDate: string;
+  endDate: string;
   file?: File | null;
 }
 
-interface AddSecurityClearanceModalProps {
+interface AddInsuranceModalProps {
   open: boolean;
   onClose: () => void;
-  onSave: (data: SecurityClearanceData) => void;
+  onSave: (data: InsuranceData) => void;
 }
 
-const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
+const AddInsuranceModal: React.FC<AddInsuranceModalProps> = ({
   open,
   onClose,
   onSave,
 }) => {
-  const [formData, setFormData] = useState<SecurityClearanceData>({
-    type: "",
-    issueDate: "",
-    expiryDate: "",
+  const [formData, setFormData] = useState<InsuranceData>({
+    insurance: "",
+    startDate: "",
+    endDate: "",
     file: null,
   });
   const [triggerValidation, setTriggerValidation] = useState(false);
 
-  const handleChange = (field: keyof SecurityClearanceData, value: any) => {
+  const handleChange = (field: keyof InsuranceData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = () => {
-    if (!formData.type || !formData.issueDate || !formData.file) {
+    if (!formData.insurance || !formData.startDate || !formData.endDate || !formData.file) {
       setTriggerValidation(true);
       return;
     }
@@ -65,9 +65,9 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
 
   const handleClose = () => {
     setFormData({
-      type: "",
-      issueDate: "",
-      expiryDate: "",
+      insurance: "",
+      startDate: "",
+      endDate: "",
       file: null,
     });
     setTriggerValidation(false);
@@ -79,15 +79,16 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
       open={open}
       onClose={handleClose}
       sx={{
-        '& .MuiDialog-container': {
-          alignItems: 'flex-start',
-          paddingTop: '10vh',
+        "& .MuiDialog-container": {
+          alignItems: "flex-start",
+          paddingTop: "10vh",
         },
       }}
       PaperProps={{
         sx: { borderRadius: 2, width: 450, margin: 0 },
       }}
     >
+      {/* HEADER */}
       <DialogTitle
         sx={{
           display: "flex",
@@ -98,7 +99,7 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
           color: "#1e285f",
         }}
       >
-        Security clearance
+        Insurance details
         <IconButton onClick={handleClose} size="small">
           <CloseIcon />
         </IconButton>
@@ -107,7 +108,7 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
       {/* BODY */}
       <DialogContent sx={{ mt: 3, mb: 2 }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-          {/* Security clearance */}
+          {/* Insurance */}
           <Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
               <Typography
@@ -117,24 +118,24 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
                   color: "#1e285f",
                 }}
               >
-                Security clearance
+                Insurance
               </Typography>
               <Typography sx={{ color: "#d32f2f", fontSize: 14 }}>*</Typography>
-
             </Box>
             <FormControl fullWidth size="small">
               <Select
-                value={formData.type}
-                onChange={(e) => handleChange("type", e.target.value)}
+                value={formData.insurance}
+                onChange={(e) => handleChange("insurance", e.target.value)}
                 displayEmpty
               >
                 <MenuItem value="" disabled>
-                  Select Security clearance
+                  Select Insurance
                 </MenuItem>
-                <MenuItem value="BPSS">BPSS (Baseline Personnel Security Standard)</MenuItem>
-                <MenuItem value="CTC">CTC (Counter Terrorist Check)</MenuItem>
-                <MenuItem value="SC">SC (Security Check)</MenuItem>
-                <MenuItem value="DV">DV (Developed Vetting)</MenuItem>
+                <MenuItem value="Professional Indemnity">Professional Indemnity</MenuItem>
+                <MenuItem value="Public Liability">Public Liability</MenuItem>
+                <MenuItem value="Employers Liability">Employers Liability</MenuItem>
+                <MenuItem value="Combined">Combined</MenuItem>
+                <MenuItem value="Other">Other</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -157,8 +158,8 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
               fullWidth
               size="small"
               type="date"
-              value={formData.issueDate}
-              onChange={(e) => handleChange("issueDate", e.target.value)}
+              value={formData.startDate}
+              onChange={(e) => handleChange("startDate", e.target.value)}
               placeholder="Select Start date"
             />
           </Box>
@@ -181,8 +182,8 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
               fullWidth
               size="small"
               type="date"
-              value={formData.expiryDate}
-              onChange={(e) => handleChange("expiryDate", e.target.value)}
+              value={formData.endDate}
+              onChange={(e) => handleChange("endDate", e.target.value)}
               placeholder="Select End date"
             />
           </Box>
@@ -225,7 +226,7 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
         <Button
           onClick={handleSave}
           variant="contained"
-          disabled={!formData.type || !formData.issueDate || !formData.file}
+          disabled={!formData.insurance || !formData.startDate || !formData.endDate || !formData.file}
           sx={{
             textTransform: "none",
             fontWeight: 600,
@@ -241,4 +242,5 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
   );
 };
 
-export default AddSecurityClearanceModal;
+export default AddInsuranceModal;
+

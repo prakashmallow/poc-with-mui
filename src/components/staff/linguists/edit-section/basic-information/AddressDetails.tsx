@@ -9,7 +9,7 @@ import {
 
 const AddressDetails: React.FC = () => {
   return (
-    <Paper elevation={0} sx={{ p: 4, borderRadius: 2, bgcolor: 'white' }}>
+    <Paper elevation={0} sx={{mt: 2, p: 4, borderRadius: 2, bgcolor: 'white' }}>
       <Typography sx={{ color: '#1e285f', borderBottom: '1px solid #e0e0e0', pb: 2 }}>
         Address Details
       </Typography>

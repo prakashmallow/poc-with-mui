@@ -7,7 +7,6 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  TextField,
   FormControl,
   Select,
   MenuItem,
@@ -19,38 +18,34 @@ import CloseIcon from "@mui/icons-material/Close";
 import SaveIcon from "@mui/icons-material/Save";
 import FileUpload from "../common/FileUpload";
 
-export interface SecurityClearanceData {
-  type: string;
-  issueDate: string;
-  expiryDate: string;
+export interface EnglishProficiencyData {
+  englishProficiency: string;
   file?: File | null;
 }
 
-interface AddSecurityClearanceModalProps {
+interface AddEnglishProficiencyModalProps {
   open: boolean;
   onClose: () => void;
-  onSave: (data: SecurityClearanceData) => void;
+  onSave: (data: EnglishProficiencyData) => void;
 }
 
-const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
+const AddEnglishProficiencyModal: React.FC<AddEnglishProficiencyModalProps> = ({
   open,
   onClose,
   onSave,
 }) => {
-  const [formData, setFormData] = useState<SecurityClearanceData>({
-    type: "",
-    issueDate: "",
-    expiryDate: "",
+  const [formData, setFormData] = useState<EnglishProficiencyData>({
+    englishProficiency: "",
     file: null,
   });
   const [triggerValidation, setTriggerValidation] = useState(false);
 
-  const handleChange = (field: keyof SecurityClearanceData, value: any) => {
+  const handleChange = (field: keyof EnglishProficiencyData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSave = () => {
-    if (!formData.type || !formData.issueDate || !formData.file) {
+    if (!formData.englishProficiency || !formData.file) {
       setTriggerValidation(true);
       return;
     }
@@ -65,9 +60,7 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
 
   const handleClose = () => {
     setFormData({
-      type: "",
-      issueDate: "",
-      expiryDate: "",
+      englishProficiency: "",
       file: null,
     });
     setTriggerValidation(false);
@@ -79,15 +72,16 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
       open={open}
       onClose={handleClose}
       sx={{
-        '& .MuiDialog-container': {
-          alignItems: 'flex-start',
-          paddingTop: '10vh',
+        "& .MuiDialog-container": {
+          alignItems: "flex-start",
+          paddingTop: "10vh",
         },
       }}
       PaperProps={{
         sx: { borderRadius: 2, width: 450, margin: 0 },
       }}
     >
+      {/* HEADER */}
       <DialogTitle
         sx={{
           display: "flex",
@@ -98,7 +92,7 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
           color: "#1e285f",
         }}
       >
-        Security clearance
+        English Proficiency
         <IconButton onClick={handleClose} size="small">
           <CloseIcon />
         </IconButton>
@@ -107,7 +101,7 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
       {/* BODY */}
       <DialogContent sx={{ mt: 3, mb: 2 }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-          {/* Security clearance */}
+          {/* English proficiency */}
           <Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
               <Typography
@@ -117,74 +111,27 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
                   color: "#1e285f",
                 }}
               >
-                Security clearance
+                English proficiency
               </Typography>
               <Typography sx={{ color: "#d32f2f", fontSize: 14 }}>*</Typography>
 
             </Box>
             <FormControl fullWidth size="small">
               <Select
-                value={formData.type}
-                onChange={(e) => handleChange("type", e.target.value)}
+                value={formData.englishProficiency}
+                onChange={(e) => handleChange("englishProficiency", e.target.value)}
                 displayEmpty
               >
                 <MenuItem value="" disabled>
-                  Select Security clearance
+                  Select English Proficiency
                 </MenuItem>
-                <MenuItem value="BPSS">BPSS (Baseline Personnel Security Standard)</MenuItem>
-                <MenuItem value="CTC">CTC (Counter Terrorist Check)</MenuItem>
-                <MenuItem value="SC">SC (Security Check)</MenuItem>
-                <MenuItem value="DV">DV (Developed Vetting)</MenuItem>
+                <MenuItem value="Native">Native</MenuItem>
+                <MenuItem value="Fluent">Fluent</MenuItem>
+                <MenuItem value="Advanced">Advanced</MenuItem>
+                <MenuItem value="Intermediate">Intermediate</MenuItem>
+                <MenuItem value="Basic">Basic</MenuItem>
               </Select>
             </FormControl>
-          </Box>
-
-          {/* Start Date */}
-          <Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
-              <Typography
-                sx={{
-                  fontSize: 14,
-                  fontWeight: 500,
-                  color: "#1e285f",
-                }}
-              >
-                Start date
-              </Typography>
-              <Typography sx={{ color: "#d32f2f", fontSize: 14 }}>*</Typography>
-            </Box>
-            <TextField
-              fullWidth
-              size="small"
-              type="date"
-              value={formData.issueDate}
-              onChange={(e) => handleChange("issueDate", e.target.value)}
-              placeholder="Select Start date"
-            />
-          </Box>
-
-          {/* End Date */}
-          <Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mb: 1 }}>
-              <Typography
-                sx={{
-                  fontSize: 14,
-                  fontWeight: 500,
-                  color: "#1e285f",
-                }}
-              >
-                End date
-              </Typography>
-              <Typography sx={{ color: "#d32f2f", fontSize: 14 }}>*</Typography>
-            </Box>
-            <TextField
-              fullWidth
-              size="small"
-              type="date"
-              value={formData.expiryDate}
-              onChange={(e) => handleChange("expiryDate", e.target.value)}
-              placeholder="Select End date"
-            />
           </Box>
 
           {/* File Upload */}
@@ -225,7 +172,7 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
         <Button
           onClick={handleSave}
           variant="contained"
-          disabled={!formData.type || !formData.issueDate || !formData.file}
+          disabled={!formData.englishProficiency || !formData.file}
           sx={{
             textTransform: "none",
             fontWeight: 600,
@@ -241,4 +188,5 @@ const AddSecurityClearanceModal: React.FC<AddSecurityClearanceModalProps> = ({
   );
 };
 
-export default AddSecurityClearanceModal;
+export default AddEnglishProficiencyModal;
+
